@@ -1,0 +1,27 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /project-service/api/v1
+
+spring:
+  application:
+    name: project-service
+
+  main:
+    allow-bean-definition-overriding: true
+
+springdoc:
+  show-actuator: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info, health, metrics
+
+logging:
+  level:
+    root: info
+
+debug: false
+
