@@ -1,0 +1,24 @@
+services:
+  project-service-db:
+    image: "postgres:latest"
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: projects
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    command: >
+      bash -c "
+      mkdir -p /docker-entrypoint-initdb.d &&
+      echo 'CREATE SCHEMA IF NOT EXISTS projects;
+      ALTER ROLE projects_admin SET search_path TO projects;'
+      > /docker-entrypoint-initdb.d/init.sql &&
+      docker-entrypoint.sh postgres
+      "
+
+volumes:
+  db-data:

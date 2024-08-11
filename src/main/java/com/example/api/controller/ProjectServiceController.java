@@ -2,6 +2,8 @@ package com.example.api.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -9,11 +11,18 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Slf4j
+@RequestMapping("/projects")
 public class ProjectServiceController {
 
-  @GetMapping()
-  String showWelcomeMessage() {
-    log.info("Showed welcome message");
-    return "Welcome to the project service!";
+  @GetMapping
+  String getAllProjects() {
+    log.info("Returning all projects");
+    return "All projects";
+  }
+
+  @PostMapping
+  String addProject() {
+    log.info("Added project");
+    return "Added project";
   }
 }

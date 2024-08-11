@@ -24,4 +24,3 @@ logging:
     root: info
 
 debug: false
-
