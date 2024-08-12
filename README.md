@@ -31,7 +31,7 @@ To get started with this repository, follow these steps:
 
 ### Future Improvements
 
-- Add collaborators and admins to projects.
+- Add collaborators, competitors and admins to projects.
 - Add Spring Security for securing endpoints.
 - Introduce asynchronous database actions using Reactor.
 - Implement event sourcing using Kafka.
