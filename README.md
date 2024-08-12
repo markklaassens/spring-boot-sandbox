@@ -1,11 +1,11 @@
-# Spring Boot Foundation Repository
+# Spring Boot Sandbox Repository
 
-Welcome to my Spring Boot foundation repository, where I experiment with Spring Boot and other Java functionalities. 
+Welcome to my Spring Boot sandbox repository, where I experiment with Spring Boot and other Java functionalities. 
 Feel free to browse the code, experiment with it, and provide feedback.
 
 ## Contents
 
-This repository serves as a foundational Spring Boot project where I explore various Spring Boot features, 
+This repository serves as a sandbox Spring Boot project where I explore various Spring Boot features, 
 such as dependency management, RESTful services, database integration, and more. It’s designed to be 
 a starting point for further experiments and learning. The application uses Hibernate for creating the database tables 
 and clears them on each startup of the application. Mandatory records are loaded after startup using the `import.sql` file in `src/main/resources`.
