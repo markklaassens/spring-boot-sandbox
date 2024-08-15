@@ -2,7 +2,10 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+
+### Repository specific
 .env
+/src/main/resources/insert_users.sql
 
 ### IntelliJ IDEA ###
 *.idea
