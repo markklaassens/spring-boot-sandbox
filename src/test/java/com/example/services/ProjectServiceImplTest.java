@@ -85,7 +85,7 @@ class ProjectServiceImplTest {
   }
 
   @Test
-  void testSaveProject_UnhappyFlow_ThrowExceptionWhenProjectTypeIsNotFound(CapturedOutput output) {
+  void shouldThrowExceptionWhenProjectTypeIsNotFound(CapturedOutput output) {
     val wrongProjectDto = ProjectDto.builder()
         .projectName("Test")
         .projectDescription("Wrong project DTO.")

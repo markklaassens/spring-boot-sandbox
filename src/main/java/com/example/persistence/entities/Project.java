@@ -33,6 +33,6 @@ public class Project {
   private String projectDescription;
 
   @ManyToOne
-  @JoinColumn(nullable = false)
+  @JoinColumn(nullable = false, name = "project_type_id")
   private ProjectType projectType;
 }

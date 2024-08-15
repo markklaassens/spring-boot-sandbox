@@ -17,19 +17,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
   /**
-   * Handles validation errors triggered by {@link MethodArgumentNotValidException}, which is typically thrown when a method
-   * argument annotated with {@code @Valid} fails validation.
+   * Handles {@link MethodArgumentNotValidException} and returns a 400 error with corresponding message(s).
    *
-   * <p>This method extracts the validation error messages from the exception, sorts them, and encapsulates
-   * them in an {@link ErrorDto} object, along with the appropriate HTTP status code.
-   *
-   * <p>The response is returned as a {@link ResponseEntity} with a status of {@code 400 BAD REQUEST} and
-   * the content type set to {@code application/json}.
-   *
-   * @param exception the {@link MethodArgumentNotValidException} that contains information about the validation errors.
-   * @return a {@link ResponseEntity} containing an {@link ErrorDto} with the list of error messages and a 400 status code.
-   * @see MethodArgumentNotValidException
-   * @see ErrorDto
+   * @param exception the validation exception
+   * @return a 400 {@link ResponseEntity} with error details
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorDto> handleValidationErrors(
@@ -49,21 +40,10 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handles exceptions related to project creation and type identification, specifically
-   * {@link ProjectAlreadyExistsException} and {@link ProjectTypeNotFoundException}.
+   * Handles project-related exceptions and returns a 400 error response with corresponding message.
    *
-   * <p>This method captures the exception message and wraps it in an {@link ErrorDto} object,
-   * along with the HTTP status code {@code 400 BAD REQUEST}.
-   *
-   * <p>The response is returned as a {@link ResponseEntity} with a status of {@code 400 BAD REQUEST}
-   * and the content type set to {@code application/json}.
-   *
-   * @param exception the {@link RuntimeException} that triggered this handler, expected to be either
-   *                  {@link ProjectAlreadyExistsException} or {@link ProjectTypeNotFoundException}.
-   * @return a {@link ResponseEntity} containing an {@link ErrorDto} with the error message and a 400 status code.
-   * @see ProjectAlreadyExistsException
-   * @see ProjectTypeNotFoundException
-   * @see ErrorDto
+   * @param exception the exception that occurred
+   * @return a 400 {@link ResponseEntity} with error details
    */
   @ExceptionHandler({
       ProjectAlreadyExistsException.class,
