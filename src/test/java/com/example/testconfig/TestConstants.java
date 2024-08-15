@@ -6,12 +6,16 @@ import static com.example.config.ApplicationConstants.COMPETITIVE;
 import com.example.api.dto.ProjectDto;
 import com.example.persistence.entities.Project;
 import com.example.persistence.entities.ProjectType;
+import com.example.persistence.entities.UserRole;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 
 @SuppressWarnings("java:S1118")
 @UtilityClass
 public class TestConstants {
+
+  public static final String CREATOR = "CREATOR";
+  public static final String USER = "USER";
 
   public static final ProjectType PROJ_TYPE_COLLABORATIVE = ProjectType.builder()
       .projectTypeId(1)
@@ -47,9 +51,14 @@ public class TestConstants {
   public static final Project PROJECT2 = Project.builder()
       .projectId(2)
       .projectName("Tetris Blocks")
-      .projectDescription("Project for competing and solving the puzzle Tetris BLocks.")
+      .projectDescription("Project for competing and solving the puzzle Tetris Blocks.")
       .projectType(PROJ_TYPE_COMPETITIVE)
       .build();
 
   public static final List<Project> PROJECT_LIST = List.of(PROJECT, PROJECT2);
+
+  public static final UserRole USER_ROLE_CREATOR = UserRole.builder()
+      .userRoleId(1)
+      .userRoleValue(CREATOR)
+      .build();
 }
