@@ -27,7 +27,7 @@ To get started with this repository, follow these steps:
 
 
 ### Setup Instructions
-
+- Clone the repository to your local machine, preferably using the default develop branch, as it includes the latest approved features.
 - Copy the `template.env` file and rename it to `.env`. Place it in the same directory. Set your local password while leaving the username unchanged.
 - Run `docker compose up -d` to start the database.
 - In `src/main/resources`, locate `insert_userstemplate.txt` copy it and rename it to `insert_users.sql`. Place it in the same directory.
