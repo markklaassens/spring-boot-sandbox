@@ -5,19 +5,16 @@ import com.example.persistence.entities.Project;
 import com.example.persistence.entities.ProjectType;
 import lombok.experimental.UtilityClass;
 
-@SuppressWarnings("java:S1118")
+@SuppressWarnings("java:S1118") // Suppresses Sonar warning which is handled by the @UtilityClass annotation from Lombok
 @UtilityClass
 public class ProjectMapper {
 
   /**
-   * Converts a {@link ProjectDto} and a {@link ProjectType} into a {@link Project} entity.
+   * Converts a {@link ProjectDto} and {@link ProjectType} to a {@link Project} entity.
    *
-   * <p>This method constructs a {@link Project} by mapping the fields from the provided
-   * {@link ProjectDto} and associating it with the given {@link ProjectType}.
-   *
-   * @param projectDto  the data transfer object containing project details.
-   * @param projectType the type of the project.
-   * @return a {@link Project} entity built from the provided DTO and project type.
+   * @param projectDto  the project details
+   * @param projectType the project type
+   * @return a {@link Project} entity
    */
   public static Project convertProjectDtoAndProjectTypeToProject(
       final ProjectDto projectDto,
@@ -31,13 +28,10 @@ public class ProjectMapper {
   }
 
   /**
-   * Converts a {@link Project} entity into a {@link ProjectDto}.
+   * Converts a {@link Project} entity to a {@link ProjectDto}.
    *
-   * <p>This method maps the fields from the provided {@link Project} to a new {@link ProjectDto},
-   * extracting and converting the necessary details.
-   *
-   * @param project the {@link Project} entity to convert.
-   * @return a {@link ProjectDto} representing the provided project entity.
+   * @param project the project entity
+   * @return a {@link ProjectDto} representation
    */
   public static ProjectDto convertProjectToProjectDto(final Project project) {
     return ProjectDto.builder()
