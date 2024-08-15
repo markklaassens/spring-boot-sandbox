@@ -1,0 +1,10 @@
+-- Insert users
+INSERT INTO USERS (user_id, username, password) VALUES (1, 'creator', '<REPLACE_WITH_ENCODED_CREATOR_PASSWORD>');
+INSERT INTO USERS (user_id, username, password) VALUES (2, 'user', '<REPLACE_WITH_ENCODED_USER_PASSWORD>');
+INSERT INTO USERS (user_id, username, password) VALUES (3, 'admin', '<REPLACE_WITH_ENCODED_ADMIN_PASSWORD>');
+-- Insert mappings users to roles
+INSERT INTO USER_ROLES_MAPPING (user_id, user_role_id) VALUES (1, 1);
+INSERT INTO USER_ROLES_MAPPING (user_id, user_role_id) VALUES (1, 2);
+INSERT INTO USER_ROLES_MAPPING (user_id, user_role_id) VALUES (2, 2);
+INSERT INTO USER_ROLES_MAPPING (user_id, user_role_id) VALUES (3, 1);
+INSERT INTO USER_ROLES_MAPPING (user_id, user_role_id) VALUES (3, 2);

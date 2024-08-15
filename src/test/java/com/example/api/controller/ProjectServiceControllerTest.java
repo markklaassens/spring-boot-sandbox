@@ -17,14 +17,17 @@ import com.example.api.dto.ProjectDto;
 import com.example.exceptions.ProjectAlreadyExistsException;
 import com.example.exceptions.ProjectTypeNotFoundException;
 import com.example.services.interfaces.ProjectService;
+import com.example.testconfig.TestSecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(ProjectServiceController.class)
+@Import(TestSecurityConfig.class)
 class ProjectServiceControllerTest {
 
   @Autowired
