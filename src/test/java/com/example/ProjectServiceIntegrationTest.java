@@ -48,7 +48,7 @@ class ProjectServiceIntegrationTest {
   }
 
   @Test
-  @WithMockUser(roles = CREATOR)
+  @WithMockUser(username = "creator", roles = CREATOR)
   public void shouldPostProjectsAsCreator() {
     String projectName = "Ultimate Tic-Tac-Toe";
 

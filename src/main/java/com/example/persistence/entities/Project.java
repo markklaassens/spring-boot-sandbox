@@ -35,4 +35,8 @@ public class Project {
   @ManyToOne
   @JoinColumn(nullable = false, name = "project_type_id")
   private ProjectType projectType;
+
+  @ManyToOne
+  @JoinColumn(nullable = false, name = "user_id")
+  private User projectCreator;
 }

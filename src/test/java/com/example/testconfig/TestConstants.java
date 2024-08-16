@@ -6,8 +6,10 @@ import static com.example.config.ApplicationConstants.COMPETITIVE;
 import com.example.api.dto.ProjectDto;
 import com.example.persistence.entities.Project;
 import com.example.persistence.entities.ProjectType;
+import com.example.persistence.entities.User;
 import com.example.persistence.entities.UserRole;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 
 @SuppressWarnings("java:S1118")
@@ -41,11 +43,24 @@ public class TestConstants {
 
   public static final List<ProjectDto> PROJECT_DTO_LIST = List.of(PROJECT_DTO, PROJECT_DTO2);
 
+  public static final UserRole USER_ROLE_CREATOR = UserRole.builder()
+      .userRoleId(1)
+      .userRoleValue(CREATOR)
+      .build();
+
+  public static final User CREATOR_USER = User.builder()
+      .userId(1)
+      .username("creator")
+      .userPassword("test123")
+      .userRoles(Set.of(USER_ROLE_CREATOR))
+      .build();
+
   public static final Project PROJECT = Project.builder()
       .projectId(1)
       .projectName("Ultimate Tic-Tac-Toe")
       .projectDescription("Project for collaborating and developing the game Ultimate Tic-Tac-Toe.")
       .projectType(PROJ_TYPE_COLLABORATIVE)
+      .projectCreator(CREATOR_USER)
       .build();
 
   public static final Project PROJECT2 = Project.builder()
@@ -53,12 +68,8 @@ public class TestConstants {
       .projectName("Tetris Blocks")
       .projectDescription("Project for competing and solving the puzzle Tetris Blocks.")
       .projectType(PROJ_TYPE_COMPETITIVE)
+      .projectCreator(CREATOR_USER)
       .build();
 
   public static final List<Project> PROJECT_LIST = List.of(PROJECT, PROJECT2);
-
-  public static final UserRole USER_ROLE_CREATOR = UserRole.builder()
-      .userRoleId(1)
-      .userRoleValue(CREATOR)
-      .build();
 }

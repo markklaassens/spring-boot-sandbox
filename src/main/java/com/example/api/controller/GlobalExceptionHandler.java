@@ -3,6 +3,7 @@ package com.example.api.controller;
 import com.example.api.dto.ErrorDto;
 import com.example.exceptions.ProjectAlreadyExistsException;
 import com.example.exceptions.ProjectTypeNotFoundException;
+import com.example.exceptions.UserNotFoundException;
 import java.util.Comparator;
 import lombok.val;
 import org.springframework.http.HttpStatus;
@@ -54,6 +55,22 @@ public class GlobalExceptionHandler {
 
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(error);
+  }
+
+  /**
+   * Handles UserNotFoundException and returns an error response.
+   *
+   * @param exception the RuntimeException thrown when a user is not found
+   * @return a ResponseEntity containing an ErrorDto with the error details
+   */
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<ErrorDto> handleUserNotFound(RuntimeException exception) {
+    val error = new ErrorDto(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .contentType(MediaType.APPLICATION_JSON)
         .body(error);
   }

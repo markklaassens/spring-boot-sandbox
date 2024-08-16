@@ -1,8 +1,9 @@
-package com.example.mappers;
+package com.example.utilities;
 
 import com.example.api.dto.ProjectDto;
 import com.example.persistence.entities.Project;
 import com.example.persistence.entities.ProjectType;
+import com.example.persistence.entities.User;
 import lombok.experimental.UtilityClass;
 
 @SuppressWarnings("java:S1118") // Suppresses Sonar warning which is handled by the @UtilityClass annotation from Lombok
@@ -18,12 +19,14 @@ public class ProjectMapper {
    */
   public static Project convertProjectDtoAndProjectTypeToProject(
       final ProjectDto projectDto,
-      final ProjectType projectType
+      final ProjectType projectType,
+      final User projectCreator
   ) {
     return Project.builder()
         .projectName(projectDto.projectName())
         .projectDescription(projectDto.projectDescription())
         .projectType(projectType)
+        .projectCreator(projectCreator)
         .build();
   }
 

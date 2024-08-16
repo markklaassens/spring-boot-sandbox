@@ -70,7 +70,5 @@ matching the connection restrictions of the LocalRMIServerSocketFactory.
 
 ## Future Improvements
 
-- Automatically add the creator to the project upon creation.
 - Enable an endpoint for adding users to the database.
 - Enable an endpoint for adding users to the project.
-

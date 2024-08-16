@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.example.api.dto.ProjectDto;
 import com.example.exceptions.ProjectAlreadyExistsException;
 import com.example.exceptions.ProjectTypeNotFoundException;
+import com.example.exceptions.UserNotFoundException;
 import com.example.services.interfaces.ProjectService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -203,4 +204,28 @@ class ProjectServiceControllerTest {
         ));
     verify(projectService, times(1)).saveProject(any(ProjectDto.class));
   }
+
+  @Test
+  void shouldReturnInternalServerErrorOnProjectTypeNotFoundException() throws Exception {
+    when(projectService.saveProject(any(ProjectDto.class))).thenThrow(
+        new UserNotFoundException("User with username 'creator' not found in database."));
+
+    mockMvc.perform(post("/projects")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "projectName": "Ultimate Tic-Tac-Toe",
+                    "projectDescription": "Project for collaborating and developing the game Ultimate Tic-Tac-Toe.",
+                    "projectType": "No Game"
+                }
+                """)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.statusCode").value("500"))
+        .andExpect(jsonPath("$.message").value(
+            "User with username 'creator' not found in database."
+        ));
+    verify(projectService, times(1)).saveProject(any(ProjectDto.class));
+  }
+
 }

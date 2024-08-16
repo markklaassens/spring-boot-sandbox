@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -43,4 +44,7 @@ public class User {
       inverseJoinColumns = @JoinColumn(name = "user_role_id")
   )
   private Set<UserRole> userRoles;
+
+  @OneToMany(mappedBy = "projectCreator")
+  private Set<Project> creatorProjects;
 }

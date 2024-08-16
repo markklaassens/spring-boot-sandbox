@@ -1,5 +1,6 @@
-package com.example.mappers;
+package com.example.utilities;
 
+import static com.example.testconfig.TestConstants.CREATOR_USER;
 import static com.example.testconfig.TestConstants.PROJECT_DTO;
 import static com.example.testconfig.TestConstants.PROJ_TYPE_COLLABORATIVE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,7 +12,7 @@ class ProjectMapperTest {
 
   @Test
   void shouldConvertProjectDtoToProjectAndBackToProjectDto() {
-    val project = ProjectMapper.convertProjectDtoAndProjectTypeToProject(PROJECT_DTO, PROJ_TYPE_COLLABORATIVE);
+    val project = ProjectMapper.convertProjectDtoAndProjectTypeToProject(PROJECT_DTO, PROJ_TYPE_COLLABORATIVE, CREATOR_USER);
     assertEquals(PROJECT_DTO.projectName(), project.getProjectName());
     assertEquals(PROJECT_DTO.projectDescription(), project.getProjectDescription());
     assertEquals(PROJECT_DTO.projectType(), project.getProjectType().getProjectTypeValue());
