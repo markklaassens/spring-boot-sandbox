@@ -6,12 +6,14 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 @Configuration
+@Profile({"local", "test"})
 public class DatabaseInitializer {
 
   private final DataSource dataSource;
