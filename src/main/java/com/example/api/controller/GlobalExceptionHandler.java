@@ -1,7 +1,9 @@
 package com.example.api.controller;
 
 import com.example.api.dto.ErrorDto;
+import com.example.exceptions.NotCreatorOfProjectException;
 import com.example.exceptions.ProjectAlreadyExistsException;
+import com.example.exceptions.ProjectNotFoundException;
 import com.example.exceptions.ProjectTypeNotFoundException;
 import com.example.exceptions.UserNotFoundException;
 import java.util.Comparator;
@@ -48,7 +50,8 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler({
       ProjectAlreadyExistsException.class,
-      ProjectTypeNotFoundException.class
+      ProjectTypeNotFoundException.class,
+      NotCreatorOfProjectException.class
   })
   public ResponseEntity<ErrorDto> handleBadRequest(RuntimeException exception) {
     val error = new ErrorDto(exception.getMessage(), HttpStatus.BAD_REQUEST.value());
@@ -60,17 +63,17 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handles UserNotFoundException and returns an error response.
+   * Handles not found exceptions and returns a 400 error with corresponding error response.
    *
    * @param exception the RuntimeException thrown when a user is not found
    * @return a ResponseEntity containing an ErrorDto with the error details
    */
-  @ExceptionHandler(UserNotFoundException.class)
-  public ResponseEntity<ErrorDto> handleUserNotFound(RuntimeException exception) {
-    val error = new ErrorDto(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+  @ExceptionHandler({ProjectNotFoundException.class, UserNotFoundException.class})
+  public ResponseEntity<ErrorDto> handleNotFound(RuntimeException exception) {
+    val error = new ErrorDto(exception.getMessage(), HttpStatus.NOT_FOUND.value());
 
     return ResponseEntity
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .status(HttpStatus.NOT_FOUND)
         .contentType(MediaType.APPLICATION_JSON)
         .body(error);
   }

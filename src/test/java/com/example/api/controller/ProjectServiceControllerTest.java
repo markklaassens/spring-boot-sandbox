@@ -4,17 +4,22 @@ import static com.example.config.ApplicationConstants.COLLABORATIVE;
 import static com.example.config.ApplicationConstants.COMPETITIVE;
 import static com.example.testconfig.TestConstants.PROJECT_DTO;
 import static com.example.testconfig.TestConstants.PROJECT_DTO_LIST;
+import static com.example.testconfig.TestConstants.PROJECT_USERS_DTO;
+import static com.example.testconfig.TestConstants.PROJECT_USERS_RESPONSE_DTO;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.api.dto.ProjectDto;
+import com.example.api.dto.ProjectUsersDto;
 import com.example.exceptions.ProjectAlreadyExistsException;
+import com.example.exceptions.ProjectNotFoundException;
 import com.example.exceptions.ProjectTypeNotFoundException;
 import com.example.exceptions.UserNotFoundException;
 import com.example.services.interfaces.ProjectService;
@@ -76,6 +81,40 @@ class ProjectServiceControllerTest {
         .andExpect(jsonPath("[1].projectType").value(COMPETITIVE));
     verify(projectService, times(1)).findAllProjects();
   }
+
+  @Test
+  void shouldUpdateProjectUsers() throws Exception {
+    when(projectService.addUsersToProject(any(ProjectUsersDto.class))).thenReturn(PROJECT_USERS_RESPONSE_DTO);
+
+    mockMvc.perform(put("/projects")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "projectName": "%s",
+                    "usernames": ["%s", "%s", "%s", "%s", "%s"]
+                }
+                """.formatted(
+                PROJECT_USERS_DTO.projectName(),
+                PROJECT_USERS_DTO.usernames().get(0),
+                PROJECT_USERS_DTO.usernames().get(1),
+                PROJECT_USERS_DTO.usernames().get(2),
+                PROJECT_USERS_DTO.usernames().get(3),
+                PROJECT_USERS_DTO.usernames().get(4)
+            ))
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.projectName").value(PROJECT_USERS_RESPONSE_DTO.projectName()))
+        .andExpect(jsonPath("$.addedUsers[0]").value(PROJECT_USERS_RESPONSE_DTO.addedUsers().get(0)))
+        .andExpect(jsonPath("$.addedUsers[1]").value(PROJECT_USERS_RESPONSE_DTO.addedUsers().get(1)))
+        .andExpect(jsonPath("$.addedUsers[2]").value(PROJECT_USERS_RESPONSE_DTO.addedUsers().get(2)))
+        .andExpect(jsonPath("$.notAddedUsers.[0].username").value("user4"))
+        .andExpect(jsonPath("$.notAddedUsers.[0].reason").value(
+            "User with username 'user4' is already added to project."))
+        .andExpect(jsonPath("$.notAddedUsers.[1].username").value("user5"))
+        .andExpect(jsonPath("$.notAddedUsers.[1].reason").value(
+            "Could not find user with username 'user5'."));
+  }
+
 
   @Test
   void shouldReturnBadRequestOnMissingValue() throws Exception {
@@ -206,7 +245,7 @@ class ProjectServiceControllerTest {
   }
 
   @Test
-  void shouldReturnInternalServerErrorOnProjectTypeNotFoundException() throws Exception {
+  void shouldReturnNotFoundOnUserNotFoundException() throws Exception {
     when(projectService.saveProject(any(ProjectDto.class))).thenThrow(
         new UserNotFoundException("User with username 'creator' not found in database."));
 
@@ -220,12 +259,33 @@ class ProjectServiceControllerTest {
                 }
                 """)
             .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isInternalServerError())
-        .andExpect(jsonPath("$.statusCode").value("500"))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.statusCode").value("404"))
         .andExpect(jsonPath("$.message").value(
             "User with username 'creator' not found in database."
         ));
     verify(projectService, times(1)).saveProject(any(ProjectDto.class));
   }
 
+  @Test
+  void shouldReturnNotFoundOnProjectNotFoundException() throws Exception {
+    when(projectService.addUsersToProject(any(ProjectUsersDto.class))).thenThrow(
+        new ProjectNotFoundException("Project with name 'Not Ultimate Tic-Tac-Toe' not found in database."));
+
+    mockMvc.perform(put("/projects")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "projectName": "Not Ultimate Tic-Tac-Toe",
+                    "usernames": ["user1", "user2", "user3"]
+                }
+                """)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.statusCode").value("404"))
+        .andExpect(jsonPath("$.message").value(
+            "Project with name 'Not Ultimate Tic-Tac-Toe' not found in database."
+        ));
+    verify(projectService, times(1)).addUsersToProject(any(ProjectUsersDto.class));
+  }
 }

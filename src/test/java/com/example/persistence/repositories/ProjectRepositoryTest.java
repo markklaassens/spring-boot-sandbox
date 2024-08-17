@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import com.example.persistence.entities.Project;
+import java.util.Set;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,8 @@ class ProjectRepositoryTest {
         "Ultimate Tic-Tac-Toe",
         "Project for collaborating and developing the game Ultimate Tic-Tac-Toe.",
         PROJ_TYPE_COLLABORATIVE,
-        CREATOR_USER
+        CREATOR_USER,
+        Set.of()
     );
     projectRepository.save(project);
     val projectList = projectRepository.findAll();

@@ -3,11 +3,15 @@ package com.example.testconfig;
 import static com.example.config.ApplicationConstants.COLLABORATIVE;
 import static com.example.config.ApplicationConstants.COMPETITIVE;
 
+import com.example.api.dto.NotAddedUserDto;
 import com.example.api.dto.ProjectDto;
+import com.example.api.dto.ProjectUsersDto;
+import com.example.api.dto.ProjectUsersResponseDto;
 import com.example.persistence.entities.Project;
 import com.example.persistence.entities.ProjectType;
 import com.example.persistence.entities.User;
 import com.example.persistence.entities.UserRole;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -48,11 +52,23 @@ public class TestConstants {
       .userRoleValue(CREATOR)
       .build();
 
+  public static final UserRole USER_ROLE_USER = UserRole.builder()
+      .userRoleId(2)
+      .userRoleValue(USER)
+      .build();
+
   public static final User CREATOR_USER = User.builder()
       .userId(1)
       .username("creator")
       .userPassword("test123")
-      .userRoles(Set.of(USER_ROLE_CREATOR))
+      .userRoles(new HashSet<>(Set.of(USER_ROLE_CREATOR)))
+      .build();
+
+  public static final User REGULAR_USER = User.builder()
+      .userId(2)
+      .username("user")
+      .userPassword("test123")
+      .userRoles(new HashSet<>(Set.of(USER_ROLE_USER)))
       .build();
 
   public static final Project PROJECT = Project.builder()
@@ -61,6 +77,7 @@ public class TestConstants {
       .projectDescription("Project for collaborating and developing the game Ultimate Tic-Tac-Toe.")
       .projectType(PROJ_TYPE_COLLABORATIVE)
       .projectCreator(CREATOR_USER)
+      .projectUsers(new HashSet<>())
       .build();
 
   public static final Project PROJECT2 = Project.builder()
@@ -69,7 +86,29 @@ public class TestConstants {
       .projectDescription("Project for competing and solving the puzzle Tetris Blocks.")
       .projectType(PROJ_TYPE_COMPETITIVE)
       .projectCreator(CREATOR_USER)
+      .projectUsers(new HashSet<>())
       .build();
 
   public static final List<Project> PROJECT_LIST = List.of(PROJECT, PROJECT2);
+
+  public static final ProjectUsersDto PROJECT_USERS_DTO = ProjectUsersDto.builder()
+      .projectName("Ultimate Tic-Tac-Toe")
+      .usernames(List.of("user", "user2", "user3", "user4", "user5"))
+      .build();
+
+  public static final NotAddedUserDto NOT_ADDED_USER_DTO1 = NotAddedUserDto.builder()
+      .username("user4")
+      .reason("User with username 'user4' is already added to project.")
+      .build();
+
+  public static final NotAddedUserDto NOT_ADDED_USER_DTO2 = NotAddedUserDto.builder()
+      .username("user5")
+      .reason("Could not find user with username 'user5'.")
+      .build();
+
+  public static final ProjectUsersResponseDto PROJECT_USERS_RESPONSE_DTO = ProjectUsersResponseDto.builder()
+      .projectName("Ultimate Tic-Tac-Toe")
+      .addedUsers(List.of("user", "user2", "user3"))
+      .notAddedUsers(List.of(NOT_ADDED_USER_DTO1, NOT_ADDED_USER_DTO2))
+      .build();
 }

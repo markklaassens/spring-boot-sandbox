@@ -1,7 +1,9 @@
 package com.example.persistence.entities;
 
 import static com.example.testconfig.TestConstants.CREATOR;
+import static com.example.testconfig.TestConstants.CREATOR_USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 import lombok.val;
@@ -14,10 +16,11 @@ class UserRoleTest {
     val userRole = new UserRole(
         1,
         CREATOR,
-        Set.of()
+        Set.of(CREATOR_USER)
     );
     assertEquals(1, userRole.getUserRoleId());
     assertEquals(CREATOR, userRole.getUserRoleValue());
-    assertEquals(Set.of(), userRole.getUsers());
+    assertEquals(1, userRole.getUsers().size());
+    assertTrue(userRole.getUsers().contains(CREATOR_USER));
   }
 }

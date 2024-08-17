@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,5 +30,6 @@ public class ProjectType {
   private String projectTypeValue;
 
   @OneToMany(mappedBy = "projectType")
-  private Set<Project> projects;
+  @Builder.Default
+  private Set<Project> projects = new HashSet<>();
 }

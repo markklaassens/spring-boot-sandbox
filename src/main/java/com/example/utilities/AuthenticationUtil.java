@@ -1,7 +1,10 @@
 package com.example.utilities;
 
+import lombok.experimental.UtilityClass;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+@SuppressWarnings("java:S1118") // Suppresses Sonar warning which is handled by the @UtilityClass annotation from Lombok
+@UtilityClass
 public class AuthenticationUtil {
 
   /**

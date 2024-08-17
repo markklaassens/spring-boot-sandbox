@@ -12,9 +12,11 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = "userPassword")
 @Entity
 @Table(name = "USERS")
 public class User {
@@ -43,8 +46,14 @@ public class User {
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "user_role_id")
   )
-  private Set<UserRole> userRoles;
+  @Builder.Default
+  private Set<UserRole> userRoles = new HashSet<>();
 
   @OneToMany(mappedBy = "projectCreator")
-  private Set<Project> creatorProjects;
+  @Builder.Default
+  private Set<Project> creatorProjects = new HashSet<>();
+
+  @ManyToMany(mappedBy = "projectUsers")
+  @Builder.Default
+  private Set<Project> userProjects = new HashSet<>();
 }

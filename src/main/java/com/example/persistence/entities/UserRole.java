@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,5 +30,6 @@ public class UserRole {
   private String userRoleValue;
 
   @ManyToMany(mappedBy = "userRoles")
-  private Set<User> users;
+  @Builder.Default
+  private Set<User> users = new HashSet<>();
 }

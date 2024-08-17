@@ -1,6 +1,8 @@
 package com.example.api.controller;
 
 import com.example.api.dto.ProjectDto;
+import com.example.api.dto.ProjectUsersDto;
+import com.example.api.dto.ProjectUsersResponseDto;
 import com.example.services.interfaces.ProjectService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,9 +37,16 @@ public class ProjectServiceController {
   }
 
   @GetMapping
-  @PreAuthorize("hasRole({'USER'})")
+  @PreAuthorize("hasRole('USER')")
   ResponseEntity<List<ProjectDto>> getAllProjects() {
     val projectDtoList = projectService.findAllProjects();
     return ResponseEntity.ok(projectDtoList);
+  }
+
+  @PutMapping
+  @PreAuthorize("hasRole('CREATOR')")
+  ResponseEntity<ProjectUsersResponseDto> updateProjectUsers(@Valid @RequestBody ProjectUsersDto projectUsersDto) {
+    val resultProjectUsersDto = projectService.addUsersToProject(projectUsersDto);
+    return ResponseEntity.ok(resultProjectUsersDto);
   }
 }

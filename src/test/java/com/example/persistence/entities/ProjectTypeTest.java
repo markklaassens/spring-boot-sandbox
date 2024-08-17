@@ -1,7 +1,9 @@
 package com.example.persistence.entities;
 
 import static com.example.config.ApplicationConstants.COLLABORATIVE;
+import static com.example.testconfig.TestConstants.PROJECT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 import lombok.val;
@@ -14,11 +16,12 @@ class ProjectTypeTest {
     val projectType = new ProjectType(
         1,
         COLLABORATIVE,
-        Set.of()
+        Set.of(PROJECT)
     );
     assertEquals(1, projectType.getProjectTypeId()
     );
     assertEquals(COLLABORATIVE, projectType.getProjectTypeValue());
-    assertEquals(Set.of(), projectType.getProjects());
+    assertEquals(1, projectType.getProjects().size());
+    assertTrue(projectType.getProjects().contains(PROJECT));
   }
 }
