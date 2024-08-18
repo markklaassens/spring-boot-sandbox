@@ -8,9 +8,12 @@ import com.example.exceptions.ProjectTypeNotFoundException;
 import com.example.exceptions.UserNotFoundException;
 import java.util.Comparator;
 import lombok.val;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -74,6 +77,55 @@ public class GlobalExceptionHandler {
 
     return ResponseEntity
         .status(HttpStatus.NOT_FOUND)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(error);
+  }
+
+  /**
+   * Handles transaction-related exceptions.
+   *
+   * @param exception the caught exception
+   * @return a ResponseEntity with error details and conflict status
+   */
+  @ExceptionHandler({DataIntegrityViolationException.class, ObjectOptimisticLockingFailureException.class})
+  public ResponseEntity<ErrorDto> handleTransactionExceptions(Exception exception) {
+    val error = new ErrorDto(exception.getMessage(), HttpStatus.CONFLICT.value());
+
+    return ResponseEntity
+        .status(HttpStatus.CONFLICT)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(error);
+  }
+
+  /**
+   * Handles access denied exceptions (403 Forbidden).
+   *
+   * @param exception the caught AccessDeniedException
+   * @return a ResponseEntity with error details and forbidden status
+   */
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ErrorDto> handleAccessDeniedException(AccessDeniedException exception) {
+    val error = new ErrorDto(exception.getMessage(), HttpStatus.FORBIDDEN.value());
+
+    return ResponseEntity
+        .status(HttpStatus.FORBIDDEN)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(error);
+  }
+
+  /**
+   * Handles unexpected exceptions.
+   *
+   * @param exception the caught exception
+   * @return a ResponseEntity with error details and internal server error status
+   */
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<ErrorDto> handleGeneralException(Exception exception) {
+    val error = new ErrorDto("An unexpected error occurred: " + exception.getMessage(),
+        HttpStatus.INTERNAL_SERVER_ERROR.value());
+
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .contentType(MediaType.APPLICATION_JSON)
         .body(error);
   }
