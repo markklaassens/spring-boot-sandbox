@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequestMapping("/projects")
-public class ProjectServiceController {
+public class ProjectController {
 
   private final ProjectService projectService;
 
-  public ProjectServiceController(ProjectService projectService) {
+  public ProjectController(ProjectService projectService) {
     this.projectService = projectService;
   }
 

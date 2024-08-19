@@ -36,7 +36,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("test")
-class ProjectServiceIntegrationTest {
+class IntegrationTest {
 
   @Autowired
   private ProjectRepository projectRepository;
