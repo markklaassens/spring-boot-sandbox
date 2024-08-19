@@ -1,6 +1,5 @@
 package com.example.services.implementations;
 
-import static com.example.utilities.AuthenticationUtil.getUsername;
 import static com.example.utilities.ProjectMapper.convertProjectToProjectDto;
 
 import com.example.api.dto.NotAddedUserDto;
@@ -35,6 +34,7 @@ public class ProjectServiceImpl implements ProjectService {
   private final ProjectRepository projectRepository;
   private final ProjectTypeRepository projectTypeRepository;
   private final UserRepository userRepository;
+  private final GetCurrentUserService getCurrentUserService;
 
   /**
    * Constructs a ProjectServiceImpl with the given repositories.
@@ -42,13 +42,17 @@ public class ProjectServiceImpl implements ProjectService {
    * @param projectRepository     the repository for managing projects
    * @param projectTypeRepository the repository for managing project types
    * @param userRepository        the repository for managing users
+   * @param getCurrentUserService the service for retrieving the current user
    */
-  public ProjectServiceImpl(ProjectRepository projectRepository, ProjectTypeRepository projectTypeRepository,
-      UserRepository userRepository
+  public ProjectServiceImpl(ProjectRepository projectRepository,
+      ProjectTypeRepository projectTypeRepository,
+      UserRepository userRepository,
+      GetCurrentUserService getCurrentUserService
   ) {
     this.projectRepository = projectRepository;
     this.projectTypeRepository = projectTypeRepository;
     this.userRepository = userRepository;
+    this.getCurrentUserService = getCurrentUserService;
   }
 
   @Override
@@ -58,7 +62,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     checkIfProjectExists(projectDto.projectName());
     val projectType = getProjectType(projectDto.projectType());
-    val projectCreator = getUser(getUsername());
+    val projectCreator = getCurrentUserService.getUser();
 
     Project project = ProjectMapper.convertProjectDtoToProject(projectDto, projectType, projectCreator);
     val savedProject = projectRepository.save(project);
@@ -85,7 +89,7 @@ public class ProjectServiceImpl implements ProjectService {
   @Transactional
   public ProjectUsersResponseDto addUsersToProject(ProjectUsersDto projectUsersDto) {
     val project = getProject(projectUsersDto.projectName());
-    val currentUser = getUser(getUsername());
+    val currentUser = getCurrentUserService.getUser();
     checkIfCurrentUserIsCreatorOfProject(project, currentUser);
 
     val addedUsers = new ArrayList<String>();
@@ -94,10 +98,10 @@ public class ProjectServiceImpl implements ProjectService {
       userRepository.findByUsername(username).ifPresentOrElse(user -> {
         if (project.getProjectUsers().contains(user)) {
           notAddedUsers.add(NotAddedUserDto.builder()
-                  .username(user.getUsername())
-                  .reason("User with username '%s' is already added to project '%s'."
-                      .formatted(user.getUsername(), project.getProjectName()))
-                  .build());
+              .username(user.getUsername())
+              .reason("User with username '%s' is already added to project '%s'."
+                  .formatted(user.getUsername(), project.getProjectName()))
+              .build());
           log.warn("User with username '%s' is already added to project '%s'."
               .formatted(user.getUsername(), project.getProjectName()));
         } else {
@@ -139,15 +143,6 @@ public class ProjectServiceImpl implements ProjectService {
     return optionalProjectType.get();
   }
 
-  private User getUser(final String username) {
-    val optionalUser = userRepository.findByUsername(username);
-    if (optionalUser.isEmpty()) {
-      log.error("User with username '%s' not found in database.".formatted(username));
-      throw new UserNotFoundException("User with username '%s' not found in database.".formatted(username));
-    }
-    return optionalUser.get();
-  }
-
   private Project getProject(final String projectName) {
     val optionalProject = projectRepository.findByProjectName(projectName);
     if (optionalProject.isEmpty()) {
@@ -162,7 +157,7 @@ public class ProjectServiceImpl implements ProjectService {
       log.error("User '%s' is not the creator of project '%s'."
           .formatted(currentUser.getUsername(), project.getProjectName()));
       throw new NotCreatorOfProjectException("User '%s' is not the creator of project '%s'."
-          .formatted(getUsername(), project.getProjectName()));
+          .formatted(currentUser.getUsername(), project.getProjectName()));
     }
   }
 }

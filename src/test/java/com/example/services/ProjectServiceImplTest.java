@@ -24,14 +24,13 @@ import com.example.exceptions.NotCreatorOfProjectException;
 import com.example.exceptions.ProjectAlreadyExistsException;
 import com.example.exceptions.ProjectNotFoundException;
 import com.example.exceptions.ProjectTypeNotFoundException;
-import com.example.exceptions.UserNotFoundException;
 import com.example.persistence.entities.Project;
 import com.example.persistence.entities.User;
 import com.example.persistence.repositories.ProjectRepository;
 import com.example.persistence.repositories.ProjectTypeRepository;
 import com.example.persistence.repositories.UserRepository;
+import com.example.services.implementations.GetCurrentUserService;
 import com.example.services.implementations.ProjectServiceImpl;
-import com.example.utilities.AuthenticationUtil;
 import com.example.utilities.ProjectMapper;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,8 +42,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
@@ -61,27 +58,28 @@ class ProjectServiceImplTest {
   @Mock
   private UserRepository userRepository;
 
+  @Mock
+  private GetCurrentUserService getCurrentUserService;
+
   @InjectMocks
   private ProjectServiceImpl projectService;
 
   @Test
   void shouldSaveProject(CapturedOutput output) {
-    try (MockedStatic<AuthenticationUtil> mockedAuthenticationUtil = Mockito.mockStatic(AuthenticationUtil.class)) {
-      when(projectRepository.findByProjectName(PROJECT_DTO.projectName())).thenReturn(Optional.empty());
-      mockedAuthenticationUtil.when(AuthenticationUtil::getUsername).thenReturn("creator");
-      when(projectTypeRepository.findByProjectTypeValue(PROJECT_DTO.projectType()))
-          .thenReturn(Optional.of(PROJ_TYPE_COLLABORATIVE));
-      when(userRepository.findByUsername("creator")).thenReturn(Optional.of(CREATOR_USER));
-      when(projectRepository.save(any(Project.class))).thenReturn(PROJECT);
+    when(projectRepository.findByProjectName(PROJECT_DTO.projectName())).thenReturn(Optional.empty());
+    when(projectTypeRepository.findByProjectTypeValue(PROJECT_DTO.projectType()))
+        .thenReturn(Optional.of(PROJ_TYPE_COLLABORATIVE));
+    when(getCurrentUserService.getUser()).thenReturn(CREATOR_USER);
+    when(projectRepository.save(any(Project.class))).thenReturn(PROJECT);
 
-      val result = projectService.saveProject(PROJECT_DTO);
+    val result = projectService.saveProject(PROJECT_DTO);
 
-      assertEquals(PROJECT_DTO, result);
-      verify(projectRepository, times(1)).save(any(Project.class));
-      assertThat(output).contains("Saved project with id '%s', name '%s' and project creator '%s'"
-          .formatted(PROJECT.getProjectId(), PROJECT.getProjectName(), PROJECT.getProjectCreator().getUsername()));
-    }
+    assertEquals(PROJECT_DTO, result);
+    verify(projectRepository, times(1)).save(any(Project.class));
+    assertThat(output).contains("Saved project with id '%s', name '%s' and project creator '%s'"
+        .formatted(PROJECT.getProjectId(), PROJECT.getProjectName(), PROJECT.getProjectCreator().getUsername()));
   }
+
 
   @Test
   void shouldFindAllProjects(CapturedOutput output) {
@@ -106,98 +104,89 @@ class ProjectServiceImplTest {
 
   @Test
   void shouldAddUsersToProject(CapturedOutput output) {
-    try (MockedStatic<AuthenticationUtil> mockedAuthenticationUtil = Mockito.mockStatic(AuthenticationUtil.class)) {
-      when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
-      mockedAuthenticationUtil.when(AuthenticationUtil::getUsername).thenReturn("creator");
-      when(userRepository.findByUsername("creator")).thenReturn(Optional.of(CREATOR_USER));
-      for (String username : PROJECT_USERS_DTO.usernames()) {
-        when(userRepository.findByUsername(username)).thenAnswer(invocation -> Optional.of(User.builder()
-            .userId(1) // id doesn't matter since data isn't persisted to database in unittest
-            .username(username)
-            .userPassword("test123")
-            .userRoles(Set.of(USER_ROLE_USER))
-            .build()));
-      }
-
-      projectService.addUsersToProject(PROJECT_USERS_DTO);
-      val usernameList = PROJECT.getProjectUsers().stream().map(User::getUsername).toList();
-
-      for (String username : PROJECT_USERS_DTO.usernames()) {
-        assertTrue(usernameList.contains(username));
-        assertThat(output).contains("Added user with username '%s' to project '%s'."
-            .formatted(username, PROJECT_USERS_DTO.projectName()));
-      }
-      PROJECT.getProjectUsers().clear(); // clear users at the end of test to prevent problems with other tests
+    when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
+    when(getCurrentUserService.getUser()).thenReturn(CREATOR_USER);
+    for (String username : PROJECT_USERS_DTO.usernames()) {
+      when(userRepository.findByUsername(username)).thenAnswer(invocation -> Optional.of(User.builder()
+          .userId(1) // id doesn't matter since data isn't persisted to database in unittest
+          .username(username)
+          .userPassword("test123")
+          .userRoles(Set.of(USER_ROLE_USER))
+          .build()));
     }
+
+    projectService.addUsersToProject(PROJECT_USERS_DTO);
+    val usernameList = PROJECT.getProjectUsers().stream().map(User::getUsername).toList();
+
+    for (String username : PROJECT_USERS_DTO.usernames()) {
+      assertTrue(usernameList.contains(username));
+      assertThat(output).contains("Added user with username '%s' to project '%s'."
+          .formatted(username, PROJECT_USERS_DTO.projectName()));
+    }
+    PROJECT.getProjectUsers().clear(); // clear users at the end of test to prevent problems with other tests
   }
 
   @Test
   void shouldNotAddDoubleUsersToProject(CapturedOutput output) {
-    try (MockedStatic<AuthenticationUtil> mockedAuthenticationUtil = Mockito.mockStatic(AuthenticationUtil.class)) {
-      when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
-      mockedAuthenticationUtil.when(AuthenticationUtil::getUsername).thenReturn("creator");
-      when(userRepository.findByUsername("creator")).thenReturn(Optional.of(CREATOR_USER));
-      List<String> newUsernames = new ArrayList<>(PROJECT_USERS_DTO.usernames());
-      newUsernames.add("user6");
-      newUsernames.add("user6");
-      for (String username : newUsernames) {
-        when(userRepository.findByUsername(username)).thenAnswer(invocation -> Optional.of(User.builder()
-            .userId(1) // id doesn't matter since data isn't persisted to database in unittest
-            .username(username)
-            .userPassword("test123")
-            .userRoles(Set.of(USER_ROLE_USER))
-            .build()));
-      }
-
-      projectService.addUsersToProject(PROJECT_USERS_DTO);
-      val amountOfUsers = PROJECT.getProjectUsers().size();
-      val result = projectService.addUsersToProject(ProjectUsersDto.builder()
-          .projectName(PROJECT_USERS_DTO.projectName())
-          .usernames(newUsernames)
-          .build());
-
-      assertEquals(amountOfUsers + 1, PROJECT.getProjectUsers().size()); // newUsernames has 1 unique added user
-      val usernameList = PROJECT.getProjectUsers().stream().map(User::getUsername).toList();
-      for (String username : newUsernames) {
-        assertTrue(result.notAddedUsers().contains(NotAddedUserDto.builder()
-            .username(username)
-            .reason("User with username '%s' is already added to project '%s'."
-                .formatted(username, PROJECT.getProjectName()))
-            .build()));
-        assertThat(output).contains("User with username '%s' is already added to project '%s'."
-            .formatted(username, PROJECT.getProjectName()));
-
-        assertTrue(usernameList.contains(username));
-        assertThat(output).contains("Added user with username '%s' to project '%s'."
-            .formatted(username, PROJECT_USERS_DTO.projectName()));
-      }
-      PROJECT.getProjectUsers().clear(); // clear users at the end of test to prevent problems with other tests
+    when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
+    when(getCurrentUserService.getUser()).thenReturn(CREATOR_USER);
+    List<String> newUsernames = new ArrayList<>(PROJECT_USERS_DTO.usernames());
+    newUsernames.add("user6");
+    newUsernames.add("user6");
+    for (String username : newUsernames) {
+      when(userRepository.findByUsername(username)).thenAnswer(invocation -> Optional.of(User.builder()
+          .userId(1) // id doesn't matter since data isn't persisted to database in unittest
+          .username(username)
+          .userPassword("test123")
+          .userRoles(Set.of(USER_ROLE_USER))
+          .build()));
     }
+
+    projectService.addUsersToProject(PROJECT_USERS_DTO);
+    val amountOfUsers = PROJECT.getProjectUsers().size();
+    val result = projectService.addUsersToProject(ProjectUsersDto.builder()
+        .projectName(PROJECT_USERS_DTO.projectName())
+        .usernames(newUsernames)
+        .build());
+
+    assertEquals(amountOfUsers + 1, PROJECT.getProjectUsers().size()); // newUsernames has 1 unique added user
+    val usernameList = PROJECT.getProjectUsers().stream().map(User::getUsername).toList();
+    for (String username : newUsernames) {
+      assertTrue(result.notAddedUsers().contains(NotAddedUserDto.builder()
+          .username(username)
+          .reason("User with username '%s' is already added to project '%s'."
+              .formatted(username, PROJECT.getProjectName()))
+          .build()));
+      assertThat(output).contains("User with username '%s' is already added to project '%s'."
+          .formatted(username, PROJECT.getProjectName()));
+
+      assertTrue(usernameList.contains(username));
+      assertThat(output).contains("Added user with username '%s' to project '%s'."
+          .formatted(username, PROJECT_USERS_DTO.projectName()));
+    }
+    PROJECT.getProjectUsers().clear(); // clear users at the end of test to prevent problems with other tests
   }
 
   @Test
   void shouldSaveNotFoundUsersWhileAddingUsersToProject(CapturedOutput output) {
-    try (MockedStatic<AuthenticationUtil> mockedAuthenticationUtil = Mockito.mockStatic(AuthenticationUtil.class)) {
-      when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
-      mockedAuthenticationUtil.when(AuthenticationUtil::getUsername).thenReturn("creator");
-      when(userRepository.findByUsername("creator")).thenReturn(Optional.of(CREATOR_USER));
-      for (String username : PROJECT_USERS_DTO.usernames()) {
-        when(userRepository.findByUsername(username)).thenAnswer(invocation -> Optional.empty());
-      }
-
-      val result = projectService.addUsersToProject(PROJECT_USERS_DTO);
-
-      assertEquals(0, PROJECT.getProjectUsers().size());
-      for (String username : PROJECT_USERS_DTO.usernames()) {
-        assertTrue(result.notAddedUsers().contains(NotAddedUserDto.builder()
-            .username(username)
-            .reason("Could not find user with username '%s'.".formatted(username))
-            .build()));
-        assertThat(output).contains("Could not find user with username '%s'."
-            .formatted(username));
-      }
-      PROJECT.getProjectUsers().clear(); // clear users at the end of test to prevent problems with other tests
+    when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
+    when(getCurrentUserService.getUser()).thenReturn(CREATOR_USER);
+    for (String username : PROJECT_USERS_DTO.usernames()) {
+      when(userRepository.findByUsername(username)).thenAnswer(invocation -> Optional.empty());
     }
+
+    val result = projectService.addUsersToProject(PROJECT_USERS_DTO);
+
+    assertEquals(0, PROJECT.getProjectUsers().size());
+    for (String username : PROJECT_USERS_DTO.usernames()) {
+      assertTrue(result.notAddedUsers().contains(NotAddedUserDto.builder()
+          .username(username)
+          .reason("Could not find user with username '%s'.".formatted(username))
+          .build()));
+      assertThat(output).contains("Could not find user with username '%s'."
+          .formatted(username));
+    }
+    PROJECT.getProjectUsers().clear(); // clear users at the end of test to prevent problems with other tests
   }
 
   @Test
@@ -241,24 +230,6 @@ class ProjectServiceImplTest {
   }
 
   @Test
-  void shouldThrowExceptionWhenUserIsNotFound(CapturedOutput output) {
-    try (MockedStatic<AuthenticationUtil> mockedAuthenticationUtil = Mockito.mockStatic(AuthenticationUtil.class)) {
-      mockedAuthenticationUtil.when(AuthenticationUtil::getUsername).thenReturn("creator");
-      when(projectTypeRepository.findByProjectTypeValue(PROJECT_DTO.projectType()))
-          .thenReturn(Optional.of(PROJ_TYPE_COLLABORATIVE));
-      when(userRepository.findByUsername("creator")).thenReturn(Optional.empty());
-
-      val exception = assertThrows(
-          UserNotFoundException.class,
-          () -> projectService.saveProject(PROJECT_DTO)
-      );
-
-      assertEquals("User with username 'creator' not found in database.", exception.getMessage());
-      assertThat(output).contains("User with username 'creator' not found in database.");
-    }
-  }
-
-  @Test
   void shouldThrowExceptionWhenProjectIsNotFound(CapturedOutput output) {
     when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.empty());
 
@@ -274,18 +245,16 @@ class ProjectServiceImplTest {
 
   @Test
   void shouldThrowExceptionWhenCreatorDoesNotMatchProjectCreator(CapturedOutput output) {
-    try (MockedStatic<AuthenticationUtil> mockedAuthenticationUtil = Mockito.mockStatic(AuthenticationUtil.class)) {
-      when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
-      mockedAuthenticationUtil.when(AuthenticationUtil::getUsername).thenReturn("user");
-      when(userRepository.findByUsername("user")).thenReturn(Optional.of(REGULAR_USER));
+    when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
+    when(getCurrentUserService.getUser()).thenReturn(REGULAR_USER);
 
-      val exception = assertThrows(NotCreatorOfProjectException.class,
-          () -> projectService.addUsersToProject(PROJECT_USERS_DTO));
+    val exception = assertThrows(NotCreatorOfProjectException.class,
+        () -> projectService.addUsersToProject(PROJECT_USERS_DTO));
 
-      assertEquals("User '%s' is not the creator of project '%s'."
-          .formatted(REGULAR_USER.getUsername(), PROJECT_USERS_DTO.projectName()), exception.getMessage());
-      assertThat(output).contains("User '%s' is not the creator of project '%s'."
-          .formatted(REGULAR_USER.getUsername(), PROJECT_USERS_DTO.projectName()));
-    }
+    assertEquals("User '%s' is not the creator of project '%s'."
+        .formatted(REGULAR_USER.getUsername(), PROJECT_USERS_DTO.projectName()), exception.getMessage());
+    assertThat(output).contains("User '%s' is not the creator of project '%s'."
+        .formatted(REGULAR_USER.getUsername(), PROJECT_USERS_DTO.projectName()));
   }
+
 }

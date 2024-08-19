@@ -72,3 +72,4 @@ matching the connection restrictions of the LocalRMIServerSocketFactory.
 
 - Enable endpoint for getting creator projects.
 - Enable an endpoint for adding users to the database.
+- Add filestore for storing project images.
