@@ -18,6 +18,7 @@ import com.example.persistence.repositories.ProjectRepository;
 import com.example.persistence.repositories.ProjectTypeRepository;
 import com.example.persistence.repositories.UserRepository;
 import com.example.services.interfaces.ProjectService;
+import com.example.services.interfaces.UserService;
 import com.example.utilities.ProjectMapper;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +35,7 @@ public class ProjectServiceImpl implements ProjectService {
   private final ProjectRepository projectRepository;
   private final ProjectTypeRepository projectTypeRepository;
   private final UserRepository userRepository;
-  private final GetCurrentUserService getCurrentUserService;
+  private final UserService userService;
 
   /**
    * Constructs a ProjectServiceImpl with the given repositories.
@@ -42,17 +43,17 @@ public class ProjectServiceImpl implements ProjectService {
    * @param projectRepository     the repository for managing projects
    * @param projectTypeRepository the repository for managing project types
    * @param userRepository        the repository for managing users
-   * @param getCurrentUserService the service for retrieving the current user
+   * @param userService           the service for retrieving the current user
    */
   public ProjectServiceImpl(ProjectRepository projectRepository,
       ProjectTypeRepository projectTypeRepository,
       UserRepository userRepository,
-      GetCurrentUserService getCurrentUserService
+      UserService userService
   ) {
     this.projectRepository = projectRepository;
     this.projectTypeRepository = projectTypeRepository;
     this.userRepository = userRepository;
-    this.getCurrentUserService = getCurrentUserService;
+    this.userService = userService;
   }
 
   @Override
@@ -62,7 +63,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     checkIfProjectExists(projectDto.projectName());
     val projectType = getProjectType(projectDto.projectType());
-    val projectCreator = getCurrentUserService.getUser();
+    val projectCreator = userService.getUser();
 
     Project project = ProjectMapper.convertProjectDtoToProject(projectDto, projectType, projectCreator);
     val savedProject = projectRepository.save(project);
@@ -89,7 +90,7 @@ public class ProjectServiceImpl implements ProjectService {
   @Transactional
   public ProjectUsersResponseDto addUsersToProject(ProjectUsersDto projectUsersDto) {
     val project = getProject(projectUsersDto.projectName());
-    val currentUser = getCurrentUserService.getUser();
+    val currentUser = userService.getUser();
     checkIfCurrentUserIsCreatorOfProject(project, currentUser);
 
     val addedUsers = new ArrayList<String>();

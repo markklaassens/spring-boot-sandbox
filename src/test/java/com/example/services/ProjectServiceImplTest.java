@@ -29,8 +29,8 @@ import com.example.persistence.entities.User;
 import com.example.persistence.repositories.ProjectRepository;
 import com.example.persistence.repositories.ProjectTypeRepository;
 import com.example.persistence.repositories.UserRepository;
-import com.example.services.implementations.GetCurrentUserService;
 import com.example.services.implementations.ProjectServiceImpl;
+import com.example.services.interfaces.UserService;
 import com.example.utilities.ProjectMapper;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,7 +59,7 @@ class ProjectServiceImplTest {
   private UserRepository userRepository;
 
   @Mock
-  private GetCurrentUserService getCurrentUserService;
+  private UserService userService;
 
   @InjectMocks
   private ProjectServiceImpl projectService;
@@ -69,7 +69,7 @@ class ProjectServiceImplTest {
     when(projectRepository.findByProjectName(PROJECT_DTO.projectName())).thenReturn(Optional.empty());
     when(projectTypeRepository.findByProjectTypeValue(PROJECT_DTO.projectType()))
         .thenReturn(Optional.of(PROJ_TYPE_COLLABORATIVE));
-    when(getCurrentUserService.getUser()).thenReturn(CREATOR_USER);
+    when(userService.getUser()).thenReturn(CREATOR_USER);
     when(projectRepository.save(any(Project.class))).thenReturn(PROJECT);
 
     val result = projectService.saveProject(PROJECT_DTO);
@@ -105,7 +105,7 @@ class ProjectServiceImplTest {
   @Test
   void shouldAddUsersToProject(CapturedOutput output) {
     when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
-    when(getCurrentUserService.getUser()).thenReturn(CREATOR_USER);
+    when(userService.getUser()).thenReturn(CREATOR_USER);
     for (String username : PROJECT_USERS_DTO.usernames()) {
       when(userRepository.findByUsername(username)).thenAnswer(invocation -> Optional.of(User.builder()
           .userId(1) // id doesn't matter since data isn't persisted to database in unittest
@@ -129,7 +129,7 @@ class ProjectServiceImplTest {
   @Test
   void shouldNotAddDoubleUsersToProject(CapturedOutput output) {
     when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
-    when(getCurrentUserService.getUser()).thenReturn(CREATOR_USER);
+    when(userService.getUser()).thenReturn(CREATOR_USER);
     List<String> newUsernames = new ArrayList<>(PROJECT_USERS_DTO.usernames());
     newUsernames.add("user6");
     newUsernames.add("user6");
@@ -170,7 +170,7 @@ class ProjectServiceImplTest {
   @Test
   void shouldSaveNotFoundUsersWhileAddingUsersToProject(CapturedOutput output) {
     when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
-    when(getCurrentUserService.getUser()).thenReturn(CREATOR_USER);
+    when(userService.getUser()).thenReturn(CREATOR_USER);
     for (String username : PROJECT_USERS_DTO.usernames()) {
       when(userRepository.findByUsername(username)).thenAnswer(invocation -> Optional.empty());
     }
@@ -246,7 +246,7 @@ class ProjectServiceImplTest {
   @Test
   void shouldThrowExceptionWhenCreatorDoesNotMatchProjectCreator(CapturedOutput output) {
     when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
-    when(getCurrentUserService.getUser()).thenReturn(REGULAR_USER);
+    when(userService.getUser()).thenReturn(REGULAR_USER);
 
     val exception = assertThrows(NotCreatorOfProjectException.class,
         () -> projectService.addUsersToProject(PROJECT_USERS_DTO));

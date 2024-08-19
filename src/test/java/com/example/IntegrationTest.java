@@ -60,7 +60,7 @@ class IntegrationTest {
   @Test
   @WithMockUser(username = "creator", roles = CREATOR)
   @Transactional
-  public void shouldPostAndAddUsersToProjectsAsCreator() {
+  public void shouldPostAddUsersAndGetCreatorProjectsToProjectsAsCreator() {
     String projectName = "Ultimate Tic-Tac-Toe";
     String userToAdd = "user";
 
@@ -100,13 +100,23 @@ class IntegrationTest {
         .body("addedUsers", hasSize(1))
         .body("notAddedUsers", hasSize(0));
 
-    val project =  projectRepository.findByProjectName(projectName).orElseThrow(
+    given()
+        .contentType(ContentType.JSON)
+        .when()
+        .get("/users/creator-projects")
+        .then()
+        .body("size()", is(1))
+        .body("[0].projectName", is(projectName))
+        .body("[0].projectDescription", is("Project for collaborating and developing the game Ultimate Tic-Tac-Toe."))
+        .body("[0].projectType", is(COLLABORATIVE));
+
+    val foundProject =  projectRepository.findByProjectName(projectName).orElseThrow(
         () -> new ProjectNotFoundException("Project with name '%s' not found in database.".formatted(projectName)));
-    assertEquals(projectName, project.getProjectName());
-    assertTrue(project.getProjectUsers().contains(userRepository.findByUsername(userToAdd).orElseThrow(
+    assertEquals(projectName, foundProject.getProjectName());
+    assertTrue(foundProject.getProjectUsers().contains(userRepository.findByUsername(userToAdd).orElseThrow(
         () -> new UserNotFoundException("User with username '%s' not found in project user list.".formatted(userToAdd)))
     ));
-    assertEquals(1, project.getProjectUsers().size());
+    assertEquals(1, foundProject.getProjectUsers().size());
   }
 
   @Test
@@ -172,6 +182,17 @@ class IntegrationTest {
             """)
         .when()
         .put("/projects")
+        .then()
+        .statusCode(403);
+  }
+
+  @Test
+  @WithMockUser(roles = USER)
+  void shouldNotSearchCreatorProjectsUsersAsUser() {
+    given()
+        .contentType(ContentType.JSON)
+        .when()
+        .get("/users/creator-projects")
         .then()
         .statusCode(403);
   }
