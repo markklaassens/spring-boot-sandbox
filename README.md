@@ -11,8 +11,8 @@ a starting point for further experiments and learning. The application uses Hibe
 and clears them on each startup of the application. Essential records are loaded after startup using the SQL scripts file in `src/main/resources`.
 The `DatabaseInitializer` class executes these scripts once the application is ready. 
 
-By default, the application includes three users: a creator, a user, and an admin. The creator has the CREATOR role, 
-the user has the USER role, and the admin has both roles. These roles determine access to the endpoints defined in the ProjectServiceController.
+By default, the application includes three users: creator, user, and combi. The creator has the CREATOR role, 
+the user has the USER role, and the combi has both roles. These roles determine access to the endpoints defined in the ProjectServiceController.
 
 ## Getting Started
 
@@ -70,6 +70,6 @@ matching the connection restrictions of the LocalRMIServerSocketFactory.
 
 ## Future Improvements
 
-- Enable endpoint for getting creator projects.
-- Enable an endpoint for adding users to the database.
+- Enable endpoint for getting all users as creator.
+- Enable https.
 - Add filestore for storing project images.

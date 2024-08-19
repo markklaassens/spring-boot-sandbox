@@ -1,4 +1,4 @@
-package com.example.testconfig;
+package com.example;
 
 import static com.example.config.ApplicationConstants.COLLABORATIVE;
 import static com.example.config.ApplicationConstants.COMPETITIVE;
@@ -7,6 +7,7 @@ import com.example.api.dto.NotAddedUserDto;
 import com.example.api.dto.ProjectDto;
 import com.example.api.dto.ProjectUsersDto;
 import com.example.api.dto.ProjectUsersResponseDto;
+import com.example.api.dto.UserDto;
 import com.example.persistence.entities.Project;
 import com.example.persistence.entities.ProjectType;
 import com.example.persistence.entities.User;
@@ -51,35 +52,19 @@ public class TestConstants {
       .userRoleId(1)
       .userRoleValue(CREATOR)
       .build();
-
-  public static final UserRole USER_ROLE_USER = UserRole.builder()
-      .userRoleId(2)
-      .userRoleValue(USER)
-      .build();
-
   public static final User CREATOR_USER = User.builder()
       .userId(1)
       .username("creator")
       .userPassword("test123")
       .userRoles(new HashSet<>(Set.of(USER_ROLE_CREATOR)))
       .build();
-
-  public static final User REGULAR_USER = User.builder()
-      .userId(2)
-      .username("user")
-      .userPassword("test123")
-      .userRoles(new HashSet<>(Set.of(USER_ROLE_USER)))
-      .build();
-
   public static final Project PROJECT = Project.builder()
       .projectId(1)
       .projectName("Ultimate Tic-Tac-Toe")
       .projectDescription("Project for collaborating and developing the game Ultimate Tic-Tac-Toe.")
       .projectType(PROJ_TYPE_COLLABORATIVE)
       .projectCreator(CREATOR_USER)
-      .projectUsers(new HashSet<>())
       .build();
-
   public static final Project PROJECT2 = Project.builder()
       .projectId(2)
       .projectName("Tetris Blocks")
@@ -88,9 +73,23 @@ public class TestConstants {
       .projectCreator(CREATOR_USER)
       .projectUsers(new HashSet<>())
       .build();
-
   public static final List<Project> PROJECT_LIST = List.of(PROJECT, PROJECT2);
-
+  public static final UserRole USER_ROLE_USER = UserRole.builder()
+      .userRoleId(2)
+      .userRoleValue(USER)
+      .build();
+  public static final User REGULAR_USER = User.builder()
+      .userId(2)
+      .username("user")
+      .userPassword("test123")
+      .userRoles(new HashSet<>(Set.of(USER_ROLE_USER)))
+      .build();
+  public static final User NEW_USER = User.builder()
+      .userId(3)
+      .username("newuser")
+      .userPassword("test123")
+      .userRoles(new HashSet<>(Set.of(USER_ROLE_USER)))
+      .build();
   public static final ProjectUsersDto PROJECT_USERS_DTO = ProjectUsersDto.builder()
       .projectName("Ultimate Tic-Tac-Toe")
       .usernames(List.of("user", "user2", "user3", "user4", "user5"))
@@ -110,5 +109,10 @@ public class TestConstants {
       .projectName("Ultimate Tic-Tac-Toe")
       .addedUsers(List.of("user", "user2", "user3"))
       .notAddedUsers(List.of(NOT_ADDED_USER_DTO1, NOT_ADDED_USER_DTO2))
+      .build();
+
+  public static final UserDto NEW_USER_DTO = UserDto.builder()
+      .username("newuser")
+      .userPassword("test123")
       .build();
 }

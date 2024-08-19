@@ -1,12 +1,14 @@
 package com.example;
 
+import static com.example.TestConstants.CREATOR;
+import static com.example.TestConstants.PROJECT;
+import static com.example.TestConstants.PROJECT2;
+import static com.example.TestConstants.USER;
 import static com.example.config.ApplicationConstants.COLLABORATIVE;
 import static com.example.config.ApplicationConstants.COMPETITIVE;
-import static com.example.testconfig.TestConstants.CREATOR;
-import static com.example.testconfig.TestConstants.PROJECT;
-import static com.example.testconfig.TestConstants.PROJECT2;
-import static com.example.testconfig.TestConstants.USER;
+import static com.example.config.ApplicationConstants.ROLE_USER;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,6 +17,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 
 import com.example.exceptions.ProjectNotFoundException;
 import com.example.exceptions.UserNotFoundException;
+import com.example.persistence.entities.UserRole;
 import com.example.persistence.repositories.ProjectRepository;
 import com.example.persistence.repositories.UserRepository;
 import io.restassured.RestAssured;
@@ -110,7 +113,7 @@ class IntegrationTest {
         .body("[0].projectDescription", is("Project for collaborating and developing the game Ultimate Tic-Tac-Toe."))
         .body("[0].projectType", is(COLLABORATIVE));
 
-    val foundProject =  projectRepository.findByProjectName(projectName).orElseThrow(
+    val foundProject = projectRepository.findByProjectName(projectName).orElseThrow(
         () -> new ProjectNotFoundException("Project with name '%s' not found in database.".formatted(projectName)));
     assertEquals(projectName, foundProject.getProjectName());
     assertTrue(foundProject.getProjectUsers().contains(userRepository.findByUsername(userToAdd).orElseThrow(
@@ -138,6 +141,31 @@ class IntegrationTest {
         .body("[1].projectName", is("Tetris Blocks"))
         .body("[1].projectDescription", is("Project for competing and solving the puzzle Tetris Blocks."))
         .body("[1].projectType", is(COMPETITIVE));
+  }
+
+  @Test
+  @WithMockUser()
+  void shouldAddUsers() {
+    String username = "newuser";
+
+    val result = given()
+        .contentType(ContentType.JSON)
+        .body("""
+            {
+                "username": "%s",
+                "userPassword": "test123"
+            }
+            """.formatted(username))
+        .when()
+        .post("/users")
+        .then()
+        .statusCode(201).extract().response();
+
+    assertEquals(username, result.body().print());
+    val addedUser = userRepository.findByUsername("newuser").orElseThrow(() ->
+        new UserNotFoundException("User with username '%s' not found in database.".formatted(username))
+    );
+    assertThat(addedUser.getUserRoles().stream().map(UserRole::getUserRoleValue).toList()).contains(ROLE_USER);
   }
 
   @Test

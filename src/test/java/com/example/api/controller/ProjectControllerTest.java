@@ -1,11 +1,11 @@
 package com.example.api.controller;
 
+import static com.example.TestConstants.PROJECT_DTO;
+import static com.example.TestConstants.PROJECT_DTO_LIST;
+import static com.example.TestConstants.PROJECT_USERS_DTO;
+import static com.example.TestConstants.PROJECT_USERS_RESPONSE_DTO;
 import static com.example.config.ApplicationConstants.COLLABORATIVE;
 import static com.example.config.ApplicationConstants.COMPETITIVE;
-import static com.example.testconfig.TestConstants.PROJECT_DTO;
-import static com.example.testconfig.TestConstants.PROJECT_DTO_LIST;
-import static com.example.testconfig.TestConstants.PROJECT_USERS_DTO;
-import static com.example.testconfig.TestConstants.PROJECT_USERS_RESPONSE_DTO;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

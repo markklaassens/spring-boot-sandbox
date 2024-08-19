@@ -1,7 +1,7 @@
 package com.example.persistence.entities;
 
+import static com.example.TestConstants.PROJECT;
 import static com.example.config.ApplicationConstants.COLLABORATIVE;
-import static com.example.testconfig.TestConstants.PROJECT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

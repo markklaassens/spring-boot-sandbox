@@ -1,6 +1,7 @@
 package com.example.api.controller;
 
 import static com.example.config.ApplicationConstants.COLLABORATIVE;
+import static com.example.config.ApplicationConstants.ROLE_USER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -10,12 +11,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.example.api.dto.ProjectDto;
 import com.example.api.dto.ProjectUsersDto;
+import com.example.api.dto.UserDto;
 import com.example.exceptions.ProjectAlreadyExistsException;
 import com.example.exceptions.ProjectNotFoundException;
 import com.example.exceptions.ProjectTypeNotFoundException;
 import com.example.exceptions.UserNotFoundException;
+import com.example.exceptions.UserRoleNotFoundException;
+import com.example.exceptions.UsernameAlreadyExistsException;
 import com.example.persistence.entities.Project;
 import com.example.services.interfaces.ProjectService;
+import com.example.services.interfaces.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -27,7 +32,10 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(controllers = ProjectController.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
+@WebMvcTest(
+    controllers = {ProjectController.class, UserController.class},
+    excludeAutoConfiguration = SecurityAutoConfiguration.class
+)
 public class GlobalExceptionHandlerTest {
 
   @Autowired
@@ -35,6 +43,9 @@ public class GlobalExceptionHandlerTest {
 
   @MockBean
   private ProjectService projectService;
+
+  @MockBean
+  private UserService userService;
 
   @Test
   void shouldReturnBadRequestOnMissingValue() throws Exception {
@@ -138,6 +149,44 @@ public class GlobalExceptionHandlerTest {
   }
 
   @Test
+  void shouldReturnBadRequestOnMaxCharactersUsername() throws Exception {
+    mockMvc.perform(post("/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "username": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "userPassword": "test123"
+                }
+                """)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.statusCode").value("400"))
+        .andExpect(jsonPath("$.message").value(
+            "Username can have a maximum of 30 characters."
+        ));
+  }
+
+  @Test
+  void shouldReturnBadRequestOnMaxCharactersPassword() throws Exception {
+    String toLongPassword = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        + "AAAAAAAAAAA";
+    mockMvc.perform(post("/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "username": "newuser",
+                    "userPassword": "%s"
+                }
+                """.formatted(toLongPassword))
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.statusCode").value("400"))
+        .andExpect(jsonPath("$.message").value(
+            "Password can have a maximum of 100 characters."
+        ));
+  }
+
+  @Test
   void shouldReturnBadRequestOnProjectAlreadyExistsException() throws Exception {
     when(projectService.saveProject(any(ProjectDto.class))).thenThrow(
         new ProjectAlreadyExistsException("Project with project name 'Ultimate Tic-Tac-Toe' already exists in database"));
@@ -177,6 +226,26 @@ public class GlobalExceptionHandlerTest {
         .andExpect(jsonPath("$.statusCode").value("400"))
         .andExpect(jsonPath("$.message").value(
             "Project type 'Together' not found in database."
+        ));
+  }
+
+  @Test
+  void shouldReturnBadRequestOnUsernameAlreadyExistsException() throws Exception {
+    when(userService.registerUser(any(UserDto.class))).thenThrow(new UsernameAlreadyExistsException(
+        "User with username 'newuser' already exists."));
+    mockMvc.perform(post("/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "username": "newuser",
+                    "userPassword": "test123"
+                }
+                """)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.statusCode").value("400"))
+        .andExpect(jsonPath("$.message").value(
+            "User with username 'newuser' already exists."
         ));
   }
 
@@ -224,6 +293,27 @@ public class GlobalExceptionHandlerTest {
   }
 
   @Test
+  void shouldReturnNotFoundOnUserRoleNotFoundException() throws Exception {
+    when(userService.registerUser(any(UserDto.class))).thenThrow(new UserRoleNotFoundException(
+        "User role '%s' not found in database.".formatted(ROLE_USER)
+    ));
+    mockMvc.perform(post("/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "username": "newuser",
+                    "userPassword": "test123"
+                }
+                """)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.statusCode").value("404"))
+        .andExpect(jsonPath("$.message").value(
+            "User role '%s' not found in database.".formatted(ROLE_USER)
+        ));
+  }
+
+  @Test
   void shouldReturnConflictOnDataIntegrityViolationException() throws Exception {
     when(projectService.saveProject(any(ProjectDto.class)))
         .thenThrow(new DataIntegrityViolationException("Unique constraint violation"));
@@ -231,12 +321,12 @@ public class GlobalExceptionHandlerTest {
     mockMvc.perform(post("/projects")
             .contentType(MediaType.APPLICATION_JSON)
             .content("""
-                    {
-                        "projectName": "Ultimate Tic-Tac-Toe",
-                        "projectDescription": "Project for collaborating and developing the game Ultimate Tic-Tac-Toe.",
-                        "projectType": "%s"
-                    }
-                    """.formatted(COLLABORATIVE))
+                {
+                    "projectName": "Ultimate Tic-Tac-Toe",
+                    "projectDescription": "Project for collaborating and developing the game Ultimate Tic-Tac-Toe.",
+                    "projectType": "%s"
+                }
+                """.formatted(COLLABORATIVE))
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isConflict())
         .andExpect(jsonPath("$.statusCode").value("409"))
@@ -251,12 +341,12 @@ public class GlobalExceptionHandlerTest {
     mockMvc.perform(post("/projects")
             .contentType(MediaType.APPLICATION_JSON)
             .content("""
-                    {
-                        "projectName": "Ultimate Tic-Tac-Toe",
-                        "projectDescription": "Project for collaborating and developing the game Ultimate Tic-Tac-Toe.",
-                        "projectType": "%s"
-                    }
-                    """.formatted(COLLABORATIVE))
+                {
+                    "projectName": "Ultimate Tic-Tac-Toe",
+                    "projectDescription": "Project for collaborating and developing the game Ultimate Tic-Tac-Toe.",
+                    "projectType": "%s"
+                }
+                """.formatted(COLLABORATIVE))
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isConflict())
         .andExpect(jsonPath("$.statusCode").value("409"))
@@ -291,12 +381,12 @@ public class GlobalExceptionHandlerTest {
     mockMvc.perform(post("/projects")
             .contentType(MediaType.APPLICATION_JSON)
             .content("""
-                    {
-                        "projectName": "Ultimate Tic-Tac-Toe",
-                        "projectDescription": "Project for collaborating and developing the game Ultimate Tic-Tac-Toe.",
-                        "projectType": "%s"
-                    }
-                    """.formatted(COLLABORATIVE))
+                {
+                    "projectName": "Ultimate Tic-Tac-Toe",
+                    "projectDescription": "Project for collaborating and developing the game Ultimate Tic-Tac-Toe.",
+                    "projectType": "%s"
+                }
+                """.formatted(COLLABORATIVE))
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isInternalServerError()) // Expect 500 Internal Server Error
         .andExpect(jsonPath("$.statusCode").value("500"))

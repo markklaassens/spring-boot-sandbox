@@ -1,0 +1,31 @@
+package com.example.mapper;
+
+import com.example.api.dto.UserDto;
+import com.example.persistence.entities.User;
+import com.example.persistence.entities.UserRole;
+import java.util.HashSet;
+import java.util.Set;
+import lombok.experimental.UtilityClass;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@UtilityClass
+public class UserMapper {
+
+  private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+  /**
+   * Converts a UserDto to a User entity with the specified UserRole.
+   *
+   * @param userDto  the DTO containing user data
+   * @param userRole the role to assign to the user
+   * @return the converted User entity
+   */
+  public static User convertUserDtoToUser(UserDto userDto, UserRole userRole) {
+    return User.builder()
+        .username(userDto.username())
+        .userPassword(passwordEncoder.encode(userDto.userPassword()))
+        .userRoles(new HashSet<>(Set.of(userRole)))
+        .build();
+  }
+}

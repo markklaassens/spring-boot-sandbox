@@ -6,6 +6,9 @@ import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
+/**
+ * ErrorDto is tested separately since it has an extra constructor for dealing with single validation messages.
+ */
 public class ErrorDtoTest {
 
   @Test

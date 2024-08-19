@@ -6,6 +6,8 @@ import com.example.exceptions.ProjectAlreadyExistsException;
 import com.example.exceptions.ProjectNotFoundException;
 import com.example.exceptions.ProjectTypeNotFoundException;
 import com.example.exceptions.UserNotFoundException;
+import com.example.exceptions.UserRoleNotFoundException;
+import com.example.exceptions.UsernameAlreadyExistsException;
 import java.util.Comparator;
 import lombok.val;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -46,7 +48,7 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handles project-related exceptions and returns a 400 error response with corresponding message.
+   * Handles bad request exceptions and returns a 400 error response with corresponding message.
    *
    * @param exception the exception that occurred
    * @return a 400 {@link ResponseEntity} with error details
@@ -54,7 +56,8 @@ public class GlobalExceptionHandler {
   @ExceptionHandler({
       ProjectAlreadyExistsException.class,
       ProjectTypeNotFoundException.class,
-      NotCreatorOfProjectException.class
+      NotCreatorOfProjectException.class,
+      UsernameAlreadyExistsException.class
   })
   public ResponseEntity<ErrorDto> handleBadRequest(RuntimeException exception) {
     val error = new ErrorDto(exception.getMessage(), HttpStatus.BAD_REQUEST.value());
@@ -66,12 +69,16 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handles not found exceptions and returns a 400 error with corresponding error response.
+   * Handles not found exceptions and returns a 404 error with corresponding error response.
    *
    * @param exception the RuntimeException thrown when a user is not found
    * @return a ResponseEntity containing an ErrorDto with the error details
    */
-  @ExceptionHandler({ProjectNotFoundException.class, UserNotFoundException.class})
+  @ExceptionHandler({
+      ProjectNotFoundException.class,
+      UserNotFoundException.class,
+      UserRoleNotFoundException.class
+  })
   public ResponseEntity<ErrorDto> handleNotFound(RuntimeException exception) {
     val error = new ErrorDto(exception.getMessage(), HttpStatus.NOT_FOUND.value());
 

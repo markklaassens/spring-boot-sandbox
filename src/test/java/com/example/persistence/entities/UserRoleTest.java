@@ -1,7 +1,7 @@
 package com.example.persistence.entities;
 
-import static com.example.testconfig.TestConstants.CREATOR;
-import static com.example.testconfig.TestConstants.CREATOR_USER;
+import static com.example.TestConstants.CREATOR;
+import static com.example.TestConstants.CREATOR_USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

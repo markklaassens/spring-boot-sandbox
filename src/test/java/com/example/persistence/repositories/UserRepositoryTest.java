@@ -1,6 +1,6 @@
 package com.example.persistence.repositories;
 
-import static com.example.testconfig.TestConstants.CREATOR_USER;
+import static com.example.TestConstants.CREATOR_USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -19,7 +19,7 @@ class UserRepositoryTest {
   private UserRepository userRepository;
 
   @Test
-  @Sql({"/insert_user_roles.sql"})
+  @Sql("/insert_user_roles.sql")
   void shouldSaveAndFindUserByUsername() {
     userRepository.save(CREATOR_USER);
     val optionalFoundUser = userRepository.findByUsername(CREATOR_USER.getUsername());

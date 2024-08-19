@@ -1,8 +1,8 @@
 package com.example.persistence.entities;
 
-import static com.example.testconfig.TestConstants.PROJECT;
-import static com.example.testconfig.TestConstants.PROJECT2;
-import static com.example.testconfig.TestConstants.USER_ROLE_CREATOR;
+import static com.example.TestConstants.PROJECT;
+import static com.example.TestConstants.PROJECT2;
+import static com.example.TestConstants.USER_ROLE_CREATOR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

@@ -1,15 +1,19 @@
 package com.example.api.controller;
 
+import static com.example.TestConstants.NEW_USER_DTO;
+import static com.example.TestConstants.PROJECT_DTO_LIST;
 import static com.example.config.ApplicationConstants.COLLABORATIVE;
 import static com.example.config.ApplicationConstants.COMPETITIVE;
-import static com.example.testconfig.TestConstants.PROJECT_DTO_LIST;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.api.dto.UserDto;
 import com.example.services.interfaces.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,5 +50,25 @@ class UserControllerTest {
         .andExpect(jsonPath("[1].projectType").value(COMPETITIVE));
 
     verify(userService, times(1)).findAllCreatorProjects();
+  }
+
+  @Test
+  void shouldReturnUsernameAfterRegister() throws Exception {
+    when(userService.registerUser(any(UserDto.class))).thenReturn(NEW_USER_DTO.username());
+
+    mockMvc.perform(post("/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "username": "newuser",
+                    "userPassword": "test123"
+                }
+                """
+            )
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$").value("newuser"));
+
+    verify(userService, times(1)).registerUser(any(UserDto.class));
   }
 }

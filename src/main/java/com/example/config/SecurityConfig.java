@@ -20,8 +20,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
   /**
-   * Configures the security filter chain to disable CSRF, permit access to Swagger,
-   * and require authentication for other requests.
+   * Configures the security filter chain to disable CSRF, permit access to Swagger, and require authentication for other
+   * requests.
    *
    * @param http the {@link HttpSecurity} to configure
    * @return the configured {@link SecurityFilterChain}

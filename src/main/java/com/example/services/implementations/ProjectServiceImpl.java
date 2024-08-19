@@ -1,6 +1,6 @@
 package com.example.services.implementations;
 
-import static com.example.utilities.ProjectMapper.convertProjectToProjectDto;
+import static com.example.mapper.ProjectMapper.convertProjectToProjectDto;
 
 import com.example.api.dto.NotAddedUserDto;
 import com.example.api.dto.ProjectDto;
@@ -11,6 +11,7 @@ import com.example.exceptions.ProjectAlreadyExistsException;
 import com.example.exceptions.ProjectNotFoundException;
 import com.example.exceptions.ProjectTypeNotFoundException;
 import com.example.exceptions.UserNotFoundException;
+import com.example.mapper.ProjectMapper;
 import com.example.persistence.entities.Project;
 import com.example.persistence.entities.ProjectType;
 import com.example.persistence.entities.User;
@@ -19,7 +20,6 @@ import com.example.persistence.repositories.ProjectTypeRepository;
 import com.example.persistence.repositories.UserRepository;
 import com.example.services.interfaces.ProjectService;
 import com.example.services.interfaces.UserService;
-import com.example.utilities.ProjectMapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

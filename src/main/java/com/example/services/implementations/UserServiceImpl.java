@@ -1,11 +1,19 @@
 package com.example.services.implementations;
 
+import static com.example.config.ApplicationConstants.ROLE_USER;
+import static com.example.mapper.UserMapper.convertUserDtoToUser;
+
 import com.example.api.dto.ProjectDto;
+import com.example.api.dto.UserDto;
 import com.example.exceptions.UserNotFoundException;
+import com.example.exceptions.UserRoleNotFoundException;
+import com.example.exceptions.UsernameAlreadyExistsException;
+import com.example.mapper.ProjectMapper;
 import com.example.persistence.entities.User;
+import com.example.persistence.entities.UserRole;
 import com.example.persistence.repositories.UserRepository;
+import com.example.persistence.repositories.UserRoleRepository;
 import com.example.services.interfaces.UserService;
-import com.example.utilities.ProjectMapper;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +27,34 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
+  private final UserRoleRepository userRoleRepository;
 
-  public UserServiceImpl(UserRepository userRepository) {
+  public UserServiceImpl(UserRepository userRepository, UserRoleRepository userRoleRepository) {
     this.userRepository = userRepository;
+    this.userRoleRepository = userRoleRepository;
+  }
+
+  @Override
+  public String registerUser(UserDto userDto) {
+    if (userRepository.findByUsername(userDto.username()).isPresent()) {
+      log.error("User with username '%s' already exists.".formatted(userDto.username()));
+      throw new UsernameAlreadyExistsException("User with username '%s' already exists.".formatted(userDto.username()));
+    }
+    userRepository.save(convertUserDtoToUser(userDto, getStandardUserRole()));
+    log.info("Created new user '%s'.".formatted(userDto.username()));
+    return userDto.username();
+  }
+
+  @Override
+  @Transactional
+  public List<ProjectDto> findAllCreatorProjects() {
+    val creatorProjects = getUser().getCreatorProjects();
+    if (creatorProjects.isEmpty()) {
+      log.warn("No creator projects found in database for user '%s'.".formatted(getUser().getUsername()));
+      return Collections.emptyList();
+    }
+    log.info("Found '%s' creator projects.".formatted(creatorProjects.size()));
+    return creatorProjects.stream().map(ProjectMapper::convertProjectToProjectDto).toList();
   }
 
   @Override
@@ -35,15 +68,12 @@ public class UserServiceImpl implements UserService {
     return optionalUser.get();
   }
 
-  @Override
-  @Transactional
-  public List<ProjectDto> findAllCreatorProjects() {
-    val creatorProjects = getUser().getCreatorProjects();
-    if (creatorProjects.isEmpty()) {
-      log.warn("No creator projects found in database for user '%s'.".formatted(getUser().getUsername()));
-      return Collections.emptyList();
+  private UserRole getStandardUserRole() {
+    val userRole = userRoleRepository.findByUserRoleValue(ROLE_USER);
+    if (userRole.isEmpty()) {
+      log.error("User role '%s' not found in database.".formatted(ROLE_USER));
+      throw new UserRoleNotFoundException("User role '%s' not found in database.".formatted(ROLE_USER));
     }
-    log.info("Found '%s' creator projects.".formatted(creatorProjects.size()));
-    return creatorProjects.stream().map(ProjectMapper::convertProjectToProjectDto).toList();
+    return userRole.get();
   }
 }
