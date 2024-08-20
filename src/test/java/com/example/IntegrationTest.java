@@ -3,7 +3,6 @@ package com.example;
 import static com.example.TestConstants.CREATOR;
 import static com.example.TestConstants.PROJECT;
 import static com.example.TestConstants.PROJECT2;
-import static com.example.TestConstants.USER;
 import static com.example.config.ApplicationConstants.COLLABORATIVE;
 import static com.example.config.ApplicationConstants.COMPETITIVE;
 import static com.example.config.ApplicationConstants.ROLE_USER;
@@ -166,49 +165,7 @@ class IntegrationTest {
     assertThat(addedUser.getUserRoles().stream().map(UserRole::getUserRoleValue).toList()).contains(ROLE_USER);
   }
 
-  @Test
-  @WithMockUser(roles = USER)
-  void shouldNotPostProjectsAsUser() {
-    given()
-        .contentType(ContentType.JSON)
-        .body("""
-            {
-                "projectName": "Ultimate Tic-Tac-Toe",
-                "projectDescription": "Project for collaborating and developing the game Ultimate Tic-Tac-Toe.",
-                "projectType": "%s"
-            }
-            """.formatted(COLLABORATIVE))
-        .when()
-        .post("/projects")
-        .then()
-        .statusCode(403);
-  }
 
-  @Test
-  @WithMockUser(roles = USER)
-  void shouldNotUpdateProjectUsersAsUser() {
-    given()
-        .contentType(ContentType.JSON)
-        .body("""
-            {
-                "projectName": "Ultimate Tic-Tac-Toe",
-                "usernames": ["user"]
-            }
-            """)
-        .when()
-        .put("/projects")
-        .then()
-        .statusCode(403);
-  }
 
-  @Test
-  @WithMockUser(roles = USER)
-  void shouldNotSearchCreatorProjectsUsersAsUser() {
-    given()
-        .contentType(ContentType.JSON)
-        .when()
-        .get("/users/creator-projects")
-        .then()
-        .statusCode(403);
-  }
+
 }

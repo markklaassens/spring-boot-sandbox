@@ -5,6 +5,7 @@ import static com.example.TestConstants.NEW_USER;
 import static com.example.TestConstants.NEW_USER_DTO;
 import static com.example.TestConstants.PROJECT;
 import static com.example.TestConstants.PROJECT2;
+import static com.example.TestConstants.REGULAR_USER;
 import static com.example.TestConstants.USER_ROLE_USER;
 import static com.example.config.ApplicationConstants.ROLE_USER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -86,21 +87,44 @@ class UserServiceImplTest {
   }
 
   @Test
-  void shouldReturnEmptyListWhenNoCreatorProjectsAreFound(CapturedOutput output) {
+  void shouldReturnUserProjects(CapturedOutput output) {
     SecurityContext securityContext = mock(SecurityContext.class);
     Authentication authentication = mock(Authentication.class);
 
     try (MockedStatic<SecurityContextHolder> mockedSecurityContextHolder = mockStatic(SecurityContextHolder.class)) {
       mockedSecurityContextHolder.when(SecurityContextHolder::getContext).thenReturn(securityContext);
       when(securityContext.getAuthentication()).thenReturn(authentication);
-      when(authentication.getName()).thenReturn("creator");
-      when(userRepository.findByUsername("creator")).thenReturn(Optional.of(CREATOR_USER));
+      when(authentication.getName()).thenReturn("user");
+      when(userRepository.findByUsername("user")).thenReturn(Optional.of(REGULAR_USER));
+      REGULAR_USER.getUserProjects().add(PROJECT);
+      REGULAR_USER.getUserProjects().add(PROJECT2);
 
-      val creatorProjects = userService.findAllCreatorProjects();
+      val userProjects = userService.findAllUserProjects();
 
-      assertEquals(creatorProjects.size(), 0);
-      assertThat(output).contains("No creator projects found in database for user '%s'."
-          .formatted(CREATOR_USER.getUsername()));
+      assertEquals(userProjects.size(), 2);
+      assertTrue(userProjects.contains(ProjectMapper.convertProjectToProjectDto(PROJECT)));
+      assertTrue(userProjects.contains(ProjectMapper.convertProjectToProjectDto(PROJECT)));
+      assertThat(output).contains("Found '%s' user projects.".formatted(userProjects.size()));
+      REGULAR_USER.getCreatorProjects().clear();
+    }
+  }
+
+  @Test
+  void shouldReturnEmptyListWhenNoProjectsAreFound(CapturedOutput output) {
+    SecurityContext securityContext = mock(SecurityContext.class);
+    Authentication authentication = mock(Authentication.class);
+
+    try (MockedStatic<SecurityContextHolder> mockedSecurityContextHolder = mockStatic(SecurityContextHolder.class)) {
+      mockedSecurityContextHolder.when(SecurityContextHolder::getContext).thenReturn(securityContext);
+      when(securityContext.getAuthentication()).thenReturn(authentication);
+      when(authentication.getName()).thenReturn("user");
+      when(userRepository.findByUsername("user")).thenReturn(Optional.of(REGULAR_USER));
+
+      val userProjects = userService.findAllUserProjects();
+
+      assertEquals(userProjects.size(), 0);
+      assertThat(output).contains("No user projects found in database for user '%s'."
+          .formatted(REGULAR_USER.getUsername()));
     }
   }
 

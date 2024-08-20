@@ -1,7 +1,9 @@
 package com.example.api.controller;
 
+import static com.example.TestConstants.CREATOR;
 import static com.example.TestConstants.NEW_USER_DTO;
 import static com.example.TestConstants.PROJECT_DTO_LIST;
+import static com.example.TestConstants.USER;
 import static com.example.config.ApplicationConstants.COLLABORATIVE;
 import static com.example.config.ApplicationConstants.COMPETITIVE;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,16 +16,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.api.dto.UserDto;
+import com.example.config.SecurityConfig;
 import com.example.services.interfaces.UserService;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(controllers = UserController.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
+@WebMvcTest(controllers = UserController.class)
+@Import(SecurityConfig.class)
 class UserControllerTest {
 
   @Autowired
@@ -32,7 +38,11 @@ class UserControllerTest {
   @MockBean
   private UserService userService;
 
+  @MockBean
+  DataSource dataSource; //Mock datasource to initialize SecurityConfig
+
   @Test
+  @WithMockUser(roles = CREATOR)
   void shouldReturnAllCreatorProjects() throws Exception {
     when(userService.findAllCreatorProjects()).thenReturn(PROJECT_DTO_LIST);
 
@@ -53,6 +63,27 @@ class UserControllerTest {
   }
 
   @Test
+  @WithMockUser(roles = USER)
+  void shouldReturnAllUserProjects() throws Exception {
+    when(userService.findAllUserProjects()).thenReturn(PROJECT_DTO_LIST);
+
+    mockMvc.perform(get("/users/user-projects")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("[0].projectName").value("Ultimate Tic-Tac-Toe"))
+        .andExpect(jsonPath("[0].projectDescription").value(
+            "Project for collaborating and developing the game Ultimate Tic-Tac-Toe."))
+        .andExpect(jsonPath("[0].projectType").value(COLLABORATIVE))
+        .andExpect(jsonPath("[1].projectName").value("Tetris Blocks"))
+        .andExpect(jsonPath("[1].projectDescription").value(
+            "Project for competing and solving the puzzle Tetris Blocks."))
+        .andExpect(jsonPath("[1].projectType").value(COMPETITIVE));
+
+    verify(userService, times(1)).findAllUserProjects();
+  }
+
+  @Test
   void shouldReturnUsernameAfterRegister() throws Exception {
     when(userService.registerUser(any(UserDto.class))).thenReturn(NEW_USER_DTO.username());
 
@@ -70,5 +101,23 @@ class UserControllerTest {
         .andExpect(jsonPath("$").value("newuser"));
 
     verify(userService, times(1)).registerUser(any(UserDto.class));
+  }
+
+  @Test
+  @WithMockUser(roles = USER)
+  void shouldNotGetCreatorProjectsAsUser() throws Exception {
+    mockMvc.perform(get("/users/creator-projects")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  @WithMockUser(roles = CREATOR)
+  void shouldNotGetUserProjectsAsCreator() throws Exception {
+    mockMvc.perform(get("/users/user-projects")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isForbidden());
   }
 }

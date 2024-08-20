@@ -58,6 +58,18 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional
+  public List<ProjectDto> findAllUserProjects() {
+    val userProjects = getUser().getUserProjects();
+    if (userProjects.isEmpty()) {
+      log.warn("No user projects found in database for user '%s'.".formatted(getUser().getUsername()));
+      return Collections.emptyList();
+    }
+    log.info("Found '%s' user projects.".formatted(userProjects.size()));
+    return userProjects.stream().map(ProjectMapper::convertProjectToProjectDto).toList();
+  }
+
+  @Override
   public User getUser() {
     val username = SecurityContextHolder.getContext().getAuthentication().getName();
     val optionalUser = userRepository.findByUsername(username);

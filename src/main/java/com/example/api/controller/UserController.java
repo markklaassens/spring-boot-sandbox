@@ -34,7 +34,14 @@ public class UserController {
   @GetMapping("/creator-projects")
   @PreAuthorize("hasRole('CREATOR')")
   ResponseEntity<List<ProjectDto>> getAllCreatorProjects() {
-    val projectDtoList = userService.findAllCreatorProjects();
-    return ResponseEntity.ok(projectDtoList);
+    val creatorProjectsList = userService.findAllCreatorProjects();
+    return ResponseEntity.ok(creatorProjectsList);
+  }
+
+  @GetMapping("/user-projects")
+  @PreAuthorize("hasRole('USER')")
+  ResponseEntity<List<ProjectDto>> getAllUserProjects() {
+    val userProjectList = userService.findAllUserProjects();
+    return ResponseEntity.ok(userProjectList);
   }
 }

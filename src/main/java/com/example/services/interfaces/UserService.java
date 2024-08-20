@@ -11,5 +11,7 @@ public interface UserService {
 
   List<ProjectDto> findAllCreatorProjects();
 
+  List<ProjectDto> findAllUserProjects();
+
   String registerUser(UserDto user);
 }
