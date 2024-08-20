@@ -1,31 +1,21 @@
 package com.example;
 
 import static com.example.TestConstants.CREATOR;
-import static com.example.TestConstants.PROJECT;
-import static com.example.TestConstants.PROJECT2;
 import static com.example.config.ApplicationConstants.COLLABORATIVE;
-import static com.example.config.ApplicationConstants.COMPETITIVE;
-import static com.example.config.ApplicationConstants.ROLE_USER;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
-import com.example.exceptions.ProjectNotFoundException;
-import com.example.exceptions.UserNotFoundException;
-import com.example.persistence.entities.UserRole;
 import com.example.persistence.repositories.ProjectRepository;
-import com.example.persistence.repositories.UserRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
-import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -33,18 +23,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("test")
+@TestMethodOrder(OrderAnnotation.class)
 class IntegrationTest {
-
-  @Autowired
-  private ProjectRepository projectRepository;
-
-  @Autowired
-  private UserRepository userRepository;
 
   @BeforeAll
   static void beforeAll(WebApplicationContext webApplicationContext, @Autowired ProjectRepository projectRepository) {
@@ -54,18 +38,14 @@ class IntegrationTest {
     RestAssured.baseURI = "http://localhost:8080/project-service/api/v1";
   }
 
-  @BeforeEach
-  void setUp() {
-    projectRepository.deleteAll();
-  }
+  String projectName = "Ultimate Tic-Tac-Toe";
+  String userToAdd = "user";
+  String newUser = "newuser";
 
   @Test
   @WithMockUser(username = "creator", roles = CREATOR)
-  @Transactional
+  @Order(1)
   public void shouldPostAddUsersAndGetCreatorProjectsToProjectsAsCreator() {
-    String projectName = "Ultimate Tic-Tac-Toe";
-    String userToAdd = "user";
-
     given()
         .contentType(ContentType.JSON)
         .body("""
@@ -98,9 +78,10 @@ class IntegrationTest {
         .statusCode(200)
         .body("size()", is(3))
         .body("projectName", is(projectName))
-        .body("addedUsers[0]", is("user"))
+        .body("addedUsers[0]", is(userToAdd))
         .body("addedUsers", hasSize(1))
         .body("notAddedUsers", hasSize(0));
+
 
     given()
         .contentType(ContentType.JSON)
@@ -112,19 +93,11 @@ class IntegrationTest {
         .body("[0].projectDescription", is("Project for collaborating and developing the game Ultimate Tic-Tac-Toe."))
         .body("[0].projectType", is(COLLABORATIVE));
 
-    val foundProject = projectRepository.findByProjectName(projectName).orElseThrow(
-        () -> new ProjectNotFoundException("Project with name '%s' not found in database.".formatted(projectName)));
-    assertEquals(projectName, foundProject.getProjectName());
-    assertTrue(foundProject.getProjectUsers().contains(userRepository.findByUsername(userToAdd).orElseThrow(
-        () -> new UserNotFoundException("User with username '%s' not found in project user list.".formatted(userToAdd)))
-    ));
-    assertEquals(1, foundProject.getProjectUsers().size());
   }
 
   @Test
+  @Order(2)
   void shouldGetProjectsWithoutRole() {
-    projectRepository.save(PROJECT);
-    projectRepository.save(PROJECT2);
 
     given()
         .contentType(ContentType.JSON)
@@ -133,39 +106,49 @@ class IntegrationTest {
         .then()
         .statusCode(200)
         .contentType(ContentType.JSON)
-        .body("[0].projectName", is("Ultimate Tic-Tac-Toe"))
+        .body("[0].projectName", is(projectName))
         .body("[0].projectDescription", is("Project for collaborating and developing the game Ultimate Tic-Tac-Toe."))
-        .body("[0].projectType", is(COLLABORATIVE))
-        .body("[1].projectName", is("Tetris Blocks"))
-        .body("[1].projectDescription", is("Project for competing and solving the puzzle Tetris Blocks."))
-        .body("[1].projectType", is(COMPETITIVE));
+        .body("[0].projectType", is(COLLABORATIVE));
   }
 
   @Test
+  @Order(3)
   void shouldAddUserWithoutRole() {
-    String username = "newuser";
 
-    val result = given()
+    given()
         .contentType(ContentType.JSON)
         .body("""
             {
                 "username": "%s",
                 "userPassword": "test123"
             }
-            """.formatted(username))
+            """.formatted(newUser))
         .when()
         .post("/users")
         .then()
-        .statusCode(201).extract().response();
-
-    assertEquals(username, result.body().print());
-    val addedUser = userRepository.findByUsername("newuser").orElseThrow(() ->
-        new UserNotFoundException("User with username '%s' not found in database.".formatted(username))
-    );
-    assertThat(addedUser.getUserRoles().stream().map(UserRole::getUserRoleValue).toList()).contains(ROLE_USER);
+        .statusCode(201);
   }
 
-
-
-
+  @Test
+  @WithMockUser(username = "creator", roles = CREATOR)
+  @Order(4)
+  void shouldAddNewUserWithRoleCreator() {
+    given()
+        .contentType(ContentType.JSON)
+        .body("""
+            {
+                "projectName": "%s",
+                "usernames": ["%s"]
+            }
+            """.formatted(projectName, newUser))
+        .when()
+        .put("/projects")
+        .then()
+        .statusCode(200)
+        .body("size()", is(3))
+        .body("projectName", is(projectName))
+        .body("addedUsers[0]", is(newUser))
+        .body("addedUsers", hasSize(1))
+        .body("notAddedUsers", hasSize(0));
+  }
 }

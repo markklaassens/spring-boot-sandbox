@@ -106,9 +106,11 @@ class ProjectServiceImplTest {
   void shouldAddUsersToProject(CapturedOutput output) {
     when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
     when(userService.getUser()).thenReturn(CREATOR_USER);
-    for (String username : PROJECT_USERS_DTO.usernames()) {
+    for (int i = 0; i < PROJECT_USERS_DTO.usernames().size(); i++) {
+      val username = PROJECT_USERS_DTO.usernames().get(i);
+      int id = i + 1;
       when(userRepository.findByUsername(username)).thenAnswer(invocation -> Optional.of(User.builder()
-          .userId(1) // id doesn't matter since data isn't persisted to database in unittest
+          .userId(id) // id doesn't matter since data isn't persisted to database in unittest
           .username(username)
           .userPassword("test123")
           .userRoles(Set.of(USER_ROLE_USER))
@@ -133,9 +135,11 @@ class ProjectServiceImplTest {
     List<String> newUsernames = new ArrayList<>(PROJECT_USERS_DTO.usernames());
     newUsernames.add("user6");
     newUsernames.add("user6");
-    for (String username : newUsernames) {
+    for (int i = 0; i < newUsernames.size(); i++) {
+      val username = newUsernames.get(i);
+      int id = i + 1;
       when(userRepository.findByUsername(username)).thenAnswer(invocation -> Optional.of(User.builder()
-          .userId(1) // id doesn't matter since data isn't persisted to database in unittest
+          .userId(id) // id doesn't matter since data isn't persisted to database in unittest
           .username(username)
           .userPassword("test123")
           .userRoles(Set.of(USER_ROLE_USER))

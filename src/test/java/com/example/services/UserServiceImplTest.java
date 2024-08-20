@@ -87,6 +87,25 @@ class UserServiceImplTest {
   }
 
   @Test
+  void shouldReturnEmptyListWhenNoCreatorProjectsAreFound(CapturedOutput output) {
+    SecurityContext securityContext = mock(SecurityContext.class);
+    Authentication authentication = mock(Authentication.class);
+
+    try (MockedStatic<SecurityContextHolder> mockedSecurityContextHolder = mockStatic(SecurityContextHolder.class)) {
+      mockedSecurityContextHolder.when(SecurityContextHolder::getContext).thenReturn(securityContext);
+      when(securityContext.getAuthentication()).thenReturn(authentication);
+      when(authentication.getName()).thenReturn("creator");
+      when(userRepository.findByUsername("creator")).thenReturn(Optional.of(CREATOR_USER));
+
+      val userProjects = userService.findAllCreatorProjects();
+
+      assertEquals(userProjects.size(), 0);
+      assertThat(output).contains("No creator projects found in database for user '%s'."
+          .formatted(CREATOR_USER.getUsername()));
+    }
+  }
+
+  @Test
   void shouldReturnUserProjects(CapturedOutput output) {
     SecurityContext securityContext = mock(SecurityContext.class);
     Authentication authentication = mock(Authentication.class);
@@ -110,7 +129,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  void shouldReturnEmptyListWhenNoProjectsAreFound(CapturedOutput output) {
+  void shouldReturnEmptyListWhenNoUserProjectsAreFound(CapturedOutput output) {
     SecurityContext securityContext = mock(SecurityContext.class);
     Authentication authentication = mock(Authentication.class);
 

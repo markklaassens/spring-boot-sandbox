@@ -28,6 +28,6 @@ class UserRepositoryTest {
     assertEquals(1, foundUser.getUserId());
     assertEquals(CREATOR_USER.getUsername(), foundUser.getUsername());
     assertEquals(CREATOR_USER.getUserPassword(), foundUser.getUserPassword());
-    assertEquals(CREATOR_USER.getUserRoles().size(), 1);
+    assertEquals(CREATOR_USER.getUserRoles().size(), foundUser.getUserRoles().size());
   }
 }

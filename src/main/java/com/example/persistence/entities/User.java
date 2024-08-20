@@ -12,7 +12,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +23,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(exclude = "userPassword")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "USERS")
 public class User {
@@ -32,6 +31,7 @@ public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column()
+  @EqualsAndHashCode.Include // Include only userId in equals and hashCode
   private Integer userId;
 
   @Column(nullable = false, unique = true, length = 50)
@@ -46,14 +46,11 @@ public class User {
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "user_role_id")
   )
-  @Builder.Default
-  private Set<UserRole> userRoles = new HashSet<>();
+  private Set<UserRole> userRoles;
 
   @OneToMany(mappedBy = "projectCreator")
-  @Builder.Default
-  private Set<Project> creatorProjects = new HashSet<>();
+  private Set<Project> creatorProjects;
 
   @ManyToMany(mappedBy = "projectUsers")
-  @Builder.Default
-  private Set<Project> userProjects = new HashSet<>();
+  private Set<Project> userProjects;
 }

@@ -118,6 +118,7 @@ public class ProjectServiceImpl implements ProjectService {
         log.warn("Could not find user with username '%s'.".formatted(username));
       });
     }
+
     projectRepository.save(project);
 
     return ProjectUsersResponseDto.builder()

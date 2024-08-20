@@ -52,19 +52,25 @@ public class TestConstants {
       .userRoleId(1)
       .userRoleValue(CREATOR)
       .build();
+
   public static final User CREATOR_USER = User.builder()
       .userId(1)
       .username("creator")
       .userPassword("test123")
-      .userRoles(new HashSet<>(Set.of(USER_ROLE_CREATOR)))
+      .userRoles(Set.of(USER_ROLE_CREATOR))
+      .creatorProjects(new HashSet<>())
+      .userProjects(new HashSet<>())
       .build();
+
   public static final Project PROJECT = Project.builder()
       .projectId(1)
       .projectName("Ultimate Tic-Tac-Toe")
       .projectDescription("Project for collaborating and developing the game Ultimate Tic-Tac-Toe.")
       .projectType(PROJ_TYPE_COLLABORATIVE)
       .projectCreator(CREATOR_USER)
+      .projectUsers(new HashSet<>())
       .build();
+
   public static final Project PROJECT2 = Project.builder()
       .projectId(2)
       .projectName("Tetris Blocks")
@@ -73,23 +79,33 @@ public class TestConstants {
       .projectCreator(CREATOR_USER)
       .projectUsers(new HashSet<>())
       .build();
+
   public static final List<Project> PROJECT_LIST = List.of(PROJECT, PROJECT2);
+
   public static final UserRole USER_ROLE_USER = UserRole.builder()
       .userRoleId(2)
       .userRoleValue(USER)
+      .users(new HashSet<>())
       .build();
+
   public static final User REGULAR_USER = User.builder()
       .userId(2)
       .username("user")
       .userPassword("test123")
-      .userRoles(new HashSet<>(Set.of(USER_ROLE_USER)))
+      .userRoles(new HashSet<>())
+      .creatorProjects(new HashSet<>())
+      .userProjects(new HashSet<>())
       .build();
+
   public static final User NEW_USER = User.builder()
       .userId(3)
       .username("newuser")
       .userPassword("test123")
-      .userRoles(new HashSet<>(Set.of(USER_ROLE_USER)))
+      .userRoles(new HashSet<>())
+      .creatorProjects(new HashSet<>())
+      .userProjects(new HashSet<>())
       .build();
+
   public static final ProjectUsersDto PROJECT_USERS_DTO = ProjectUsersDto.builder()
       .projectName("Ultimate Tic-Tac-Toe")
       .usernames(List.of("user", "user2", "user3", "user4", "user5"))
