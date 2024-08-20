@@ -123,8 +123,7 @@ class IntegrationTest {
   }
 
   @Test
-  @WithMockUser(roles = USER)
-  void shouldGetProjectsAsUser() {
+  void shouldGetProjectsWithoutRole() {
     projectRepository.save(PROJECT);
     projectRepository.save(PROJECT2);
 
@@ -144,8 +143,7 @@ class IntegrationTest {
   }
 
   @Test
-  @WithMockUser()
-  void shouldAddUsers() {
+  void shouldAddUserWithoutRole() {
     String username = "newuser";
 
     val result = given()
@@ -166,17 +164,6 @@ class IntegrationTest {
         new UserNotFoundException("User with username '%s' not found in database.".formatted(username))
     );
     assertThat(addedUser.getUserRoles().stream().map(UserRole::getUserRoleValue).toList()).contains(ROLE_USER);
-  }
-
-  @Test
-  @WithMockUser(roles = CREATOR)
-  void shouldNotGetProjectsAsCreator() {
-    given()
-        .contentType(ContentType.JSON)
-        .when()
-        .get("/projects")
-        .then()
-        .statusCode(403);
   }
 
   @Test

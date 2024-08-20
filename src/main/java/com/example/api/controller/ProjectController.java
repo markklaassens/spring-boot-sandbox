@@ -35,7 +35,6 @@ public class ProjectController {
   }
 
   @GetMapping
-  @PreAuthorize("hasRole('USER')")
   ResponseEntity<List<ProjectDto>> getAllProjects() {
     val projectDtoList = projectService.findAllProjects();
     return ResponseEntity.ok(projectDtoList);
