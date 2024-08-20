@@ -70,6 +70,6 @@ matching the connection restrictions of the LocalRMIServerSocketFactory.
 
 ## Future Improvements
 
-- Enable endpoint for getting all users as creator.
-- Enable https.
+- Enable https
 - Add filestore for storing project images.
+- Add asynchronous database handeling with Reactor
