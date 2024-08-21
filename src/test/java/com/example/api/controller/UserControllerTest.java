@@ -1,9 +1,10 @@
 package com.example.api.controller;
 
 import static com.example.TestConstants.CREATOR;
-import static com.example.TestConstants.NEW_USER_DTO;
+import static com.example.TestConstants.NEW_USER_RESPONSE_DTO;
 import static com.example.TestConstants.PROJECT_DTO_LIST;
 import static com.example.TestConstants.USER;
+import static com.example.TestConstants.USER_RESPONSE_DTO_LIST;
 import static com.example.config.ApplicationConstants.COLLABORATIVE;
 import static com.example.config.ApplicationConstants.COMPETITIVE;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,6 +41,39 @@ class UserControllerTest {
 
   @MockBean
   private UserService userService;
+
+  @Test
+  void shouldReturnUsernameAfterRegister() throws Exception {
+    when(userService.registerUser(any(UserDto.class))).thenReturn(NEW_USER_RESPONSE_DTO);
+
+    mockMvc.perform(post("/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "username": "newuser",
+                    "userPassword": "test123"
+                }
+                """
+            )
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.username").value("newuser"));
+
+    verify(userService, times(1)).registerUser(any(UserDto.class));
+  }
+
+  @Test
+  @WithMockUser(roles = CREATOR)
+  void shouldGetAllUsers() throws Exception {
+    when(userService.findAllUsers()).thenReturn(USER_RESPONSE_DTO_LIST);
+    mockMvc.perform(get("/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("[0].username").value("newuser"))
+        .andExpect(jsonPath("[1].username").value("user"))
+        .andExpect(jsonPath("[2].username").value("creator"));
+  }
 
   @Test
   @WithMockUser(roles = CREATOR)
@@ -84,23 +118,12 @@ class UserControllerTest {
   }
 
   @Test
-  void shouldReturnUsernameAfterRegister() throws Exception {
-    when(userService.registerUser(any(UserDto.class))).thenReturn(NEW_USER_DTO.username());
-
-    mockMvc.perform(post("/users")
+  @WithMockUser(roles = USER)
+  void shouldNotGetAllUsersAsUser() throws Exception {
+    mockMvc.perform(get("/users")
             .contentType(MediaType.APPLICATION_JSON)
-            .content("""
-                {
-                    "username": "newuser",
-                    "userPassword": "test123"
-                }
-                """
-            )
             .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$").value("newuser"));
-
-    verify(userService, times(1)).registerUser(any(UserDto.class));
+        .andExpect(status().isForbidden());
   }
 
   @Test

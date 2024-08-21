@@ -6,6 +6,7 @@ import static com.example.TestConstants.NEW_USER_DTO;
 import static com.example.TestConstants.PROJECT;
 import static com.example.TestConstants.PROJECT2;
 import static com.example.TestConstants.REGULAR_USER;
+import static com.example.TestConstants.USER_LIST;
 import static com.example.TestConstants.USER_ROLE_USER;
 import static com.example.config.ApplicationConstants.ROLE_USER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,6 +26,7 @@ import com.example.persistence.entities.User;
 import com.example.persistence.repositories.UserRepository;
 import com.example.persistence.repositories.UserRoleRepository;
 import com.example.services.implementations.UserServiceImpl;
+import java.util.Collections;
 import java.util.Optional;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -57,10 +59,34 @@ class UserServiceImplTest {
     when(userRepository.save(any(User.class))).thenReturn(NEW_USER);
     when(userRoleRepository.findByUserRoleValue(ROLE_USER)).thenReturn(Optional.of(USER_ROLE_USER));
 
-    val username = userService.registerUser(NEW_USER_DTO);
+    val userResponseDto = userService.registerUser(NEW_USER_DTO);
 
-    assertEquals(username, NEW_USER.getUsername());
+    assertEquals(NEW_USER.getUsername(), userResponseDto.username());
     assertThat(output).contains("Created new user '%s'.".formatted(NEW_USER.getUsername()));
+  }
+
+  @Test
+  void shouldReturnAllUsers(CapturedOutput output) {
+    when(userRepository.findAll()).thenReturn(USER_LIST);
+    val usernameList = USER_LIST.stream().map(User::getUsername).toList();
+
+    val userResponseDtoList = userService.findAllUsers();
+
+    assertEquals(USER_LIST.size(), userResponseDtoList.size());
+    for (val user : userResponseDtoList) {
+      assertTrue(usernameList.contains(user.username()));
+    }
+    assertThat(output).contains("Found '%s' users.".formatted(USER_LIST.size()));
+  }
+
+  @Test
+  void shouldReturnEmptyListWhenNoUsersAreFound(CapturedOutput output) {
+    when(userRepository.findAll()).thenReturn(Collections.emptyList());
+
+    val userResponseDtoList = userService.findAllUsers();
+
+    assertEquals(0, userResponseDtoList.size());
+    assertThat(output).contains("No users found.");
   }
 
   @Test

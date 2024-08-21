@@ -1,6 +1,7 @@
 package com.example.mapper;
 
 import com.example.api.dto.UserDto;
+import com.example.api.dto.UserResponseDto;
 import com.example.persistence.entities.User;
 import com.example.persistence.entities.UserRole;
 import java.util.HashSet;
@@ -26,6 +27,18 @@ public class UserMapper {
         .username(userDto.username())
         .userPassword(passwordEncoder.encode(userDto.userPassword()))
         .userRoles(new HashSet<>(Set.of(userRole)))
+        .build();
+  }
+
+  /**
+   * Converts a User to a UserResponseDto.
+   *
+   * @param user the User entity to convert
+   * @return the converted UserResponseDto
+   */
+  public static UserResponseDto convertUserToUserResponseDto(User user) {
+    return UserResponseDto.builder()
+        .username(user.getUsername())
         .build();
   }
 }

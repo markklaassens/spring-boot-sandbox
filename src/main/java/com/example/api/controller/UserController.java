@@ -2,6 +2,7 @@ package com.example.api.controller;
 
 import com.example.api.dto.ProjectDto;
 import com.example.api.dto.UserDto;
+import com.example.api.dto.UserResponseDto;
 import com.example.services.interfaces.UserService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -26,9 +27,16 @@ public class UserController {
   }
 
   @PostMapping
-  ResponseEntity<String> saveUser(@Valid @RequestBody UserDto user) {
+  ResponseEntity<UserResponseDto> saveUser(@Valid @RequestBody UserDto user) {
     val registeredUsername = userService.registerUser(user);
     return new ResponseEntity<>(registeredUsername, HttpStatus.CREATED);
+  }
+
+  @GetMapping()
+  @PreAuthorize("hasRole('CREATOR')")
+  ResponseEntity<List<UserResponseDto>> getAllUsers() {
+    val userList = userService.findAllUsers();
+    return ResponseEntity.ok(userList);
   }
 
   @GetMapping("/creator-projects")

@@ -5,10 +5,12 @@ import static com.example.mapper.UserMapper.convertUserDtoToUser;
 
 import com.example.api.dto.ProjectDto;
 import com.example.api.dto.UserDto;
+import com.example.api.dto.UserResponseDto;
 import com.example.exceptions.UserNotFoundException;
 import com.example.exceptions.UserRoleNotFoundException;
 import com.example.exceptions.UsernameAlreadyExistsException;
 import com.example.mapper.ProjectMapper;
+import com.example.mapper.UserMapper;
 import com.example.persistence.entities.User;
 import com.example.persistence.entities.UserRole;
 import com.example.persistence.repositories.UserRepository;
@@ -35,14 +37,25 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public String registerUser(UserDto userDto) {
+  public UserResponseDto registerUser(UserDto userDto) {
     if (userRepository.findByUsername(userDto.username()).isPresent()) {
       log.error("User with username '%s' already exists.".formatted(userDto.username()));
       throw new UsernameAlreadyExistsException("User with username '%s' already exists.".formatted(userDto.username()));
     }
     userRepository.save(convertUserDtoToUser(userDto, getStandardUserRole()));
     log.info("Created new user '%s'.".formatted(userDto.username()));
-    return userDto.username();
+    return UserResponseDto.builder().username(userDto.username()).build();
+  }
+
+  @Override
+  public List<UserResponseDto> findAllUsers() {
+    val userList = userRepository.findAll();
+    if (userList.isEmpty()) {
+      log.warn("No users found.");
+      return Collections.emptyList();
+    }
+    log.info("Found '%s' users.".formatted(userList.size()));
+    return userRepository.findAll().stream().map(UserMapper::convertUserToUserResponseDto).toList();
   }
 
   @Override

@@ -8,6 +8,7 @@ import com.example.api.dto.ProjectDto;
 import com.example.api.dto.ProjectUsersDto;
 import com.example.api.dto.ProjectUsersResponseDto;
 import com.example.api.dto.UserDto;
+import com.example.api.dto.UserResponseDto;
 import com.example.persistence.entities.Project;
 import com.example.persistence.entities.ProjectType;
 import com.example.persistence.entities.User;
@@ -131,4 +132,21 @@ public class TestConstants {
       .username("newuser")
       .userPassword("test123")
       .build();
+
+  public static final UserResponseDto NEW_USER_RESPONSE_DTO = UserResponseDto.builder()
+      .username("newuser")
+      .build();
+
+  public static final UserResponseDto REGULAR_USER_RESPONSE_DTO = UserResponseDto.builder()
+      .username("user")
+      .build();
+
+  public static final UserResponseDto CREATOR_USER_RESPONSE_DTO = UserResponseDto.builder()
+      .username("creator")
+      .build();
+
+  public static List<UserResponseDto> USER_RESPONSE_DTO_LIST = List.of(NEW_USER_RESPONSE_DTO,
+      REGULAR_USER_RESPONSE_DTO, CREATOR_USER_RESPONSE_DTO);
+
+  public static List<User> USER_LIST = List.of(NEW_USER, REGULAR_USER, CREATOR_USER);
 }
