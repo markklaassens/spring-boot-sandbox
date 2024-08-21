@@ -35,7 +35,7 @@ class IntegrationTest {
     projectRepository.deleteAll();
     MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
     RestAssuredMockMvc.mockMvc(mockMvc);
-    RestAssured.baseURI = "http://localhost:8080/project-service/api/v1";
+    RestAssured.baseURI = "http://localhost:8080/spring-boot-sandbox/api/v1";
   }
 
   String projectName = "Ultimate Tic-Tac-Toe";

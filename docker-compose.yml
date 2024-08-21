@@ -1,5 +1,5 @@
 services:
-  project-service-db:
+  db:
     image: "postgres:latest"
     env_file:
       - .env

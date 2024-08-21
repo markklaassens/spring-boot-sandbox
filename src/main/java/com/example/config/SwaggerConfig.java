@@ -19,7 +19,7 @@ public class SwaggerConfig {
   @Bean
   public OpenAPI customOpenApi() {
     return new OpenAPI()
-        .info(new Info().title("project-service").version("1.0.0"))
+        .info(new Info().title("spring-boot-sandbox").version("1.0.0"))
         .components(new Components()
             .addSecuritySchemes("Basic authentication",
                 new SecurityScheme()

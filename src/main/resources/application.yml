@@ -1,11 +1,11 @@
 server:
   port: 8080
   servlet:
-    context-path: /project-service/api/v1
+    context-path: /spring-boot-sandbox/api/v1
 
 spring:
   application:
-    name: project-service
+    name: spring-boot-sandbox
 
   main:
     allow-bean-definition-overriding: true

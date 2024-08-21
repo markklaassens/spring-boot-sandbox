@@ -39,7 +39,7 @@ To get started with this repository, follow these steps:
 - (Optional) run `mvn versions:display-property-updates` and `mvn versions:display-parent-updates` to check for dependency updates and apply those in `pom.xml`.
 - Run the Spring Boot application with the 'local' profile from your IDE.
 - (Alternative) If you don't use IntelliJ IDEA you can run the application with: `mvn spring-boot:run -Dspring-boot.run.profiles=local` from the root directory.
-- Visit the [Swagger UI](http://localhost:8080/project-service/api/v1/swagger-ui/index.html).
+- Visit the [Swagger UI](http://localhost:8080/spring-boot-sandbox/api/v1/swagger-ui/index.html).
 - Log in with the username and password you set by clicking the white and green Authorize button on the right side of the Swagger UI.
 - By default, the POST endpoint is accessible only to the creator, while the GET endpoint is accessible only to the user. The admin can access both endpoints.
 
@@ -51,7 +51,7 @@ The error described below is not project-specific but can occur when the IDE’s
 
 If the following error occurs:
 ````
-2024-08-15T17:25:59.670+02:00  WARN 64199 --- [project-service] [MI TCP Accept-0] sun.rmi.transport.tcp                    : RMI TCP Accept-0: accept loop for ServerSocket[addr=0.0.0.0/0.0.0.0,localport=58947] throws
+2024-08-15T17:25:59.670+02:00  WARN 64199 --- [spring-boot-sandbox] [MI TCP Accept-0] sun.rmi.transport.tcp                    : RMI TCP Accept-0: accept loop for ServerSocket[addr=0.0.0.0/0.0.0.0,localport=58947] throws
 
 java.io.IOException: The server sockets created using the LocalRMIServerSocketFactory only accept connections from clients running on the host where the RMI remote objects have been exported.
 ````
