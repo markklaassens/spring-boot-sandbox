@@ -61,24 +61,26 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public List<ProjectDto> findAllCreatorProjects() {
-    val creatorProjects = getUser().getCreatorProjects();
+    val currentUser = getUser();
+    val creatorProjects = currentUser.getCreatorProjects();
     if (creatorProjects.isEmpty()) {
       log.warn("No creator projects found in database for user '%s'.".formatted(getUser().getUsername()));
       return Collections.emptyList();
     }
-    log.info("Found '%s' creator projects.".formatted(creatorProjects.size()));
+    log.info("Found '%s' creator projects for user '%s'.".formatted(creatorProjects.size(), getUser().getUsername()));
     return creatorProjects.stream().map(ProjectMapper::convertProjectToProjectDto).toList();
   }
 
   @Override
   @Transactional
   public List<ProjectDto> findAllUserProjects() {
-    val userProjects = getUser().getUserProjects();
+    val currentUser = getUser();
+    val userProjects = currentUser.getUserProjects();
     if (userProjects.isEmpty()) {
       log.warn("No user projects found in database for user '%s'.".formatted(getUser().getUsername()));
       return Collections.emptyList();
     }
-    log.info("Found '%s' user projects.".formatted(userProjects.size()));
+    log.info("Found '%s' user projects for user '%s'.".formatted(userProjects.size(), currentUser.getUsername()));
     return userProjects.stream().map(ProjectMapper::convertProjectToProjectDto).toList();
   }
 

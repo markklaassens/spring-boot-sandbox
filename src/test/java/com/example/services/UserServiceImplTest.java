@@ -107,7 +107,8 @@ class UserServiceImplTest {
       assertEquals(creatorProjects.size(), 2);
       assertTrue(creatorProjects.contains(ProjectMapper.convertProjectToProjectDto(PROJECT)));
       assertTrue(creatorProjects.contains(ProjectMapper.convertProjectToProjectDto(PROJECT)));
-      assertThat(output).contains("Found '%s' creator projects.".formatted(creatorProjects.size()));
+      assertThat(output).contains("Found '%s' creator projects for user '%s'."
+          .formatted(creatorProjects.size(), CREATOR_USER.getUsername()));
       CREATOR_USER.getCreatorProjects().clear();
     }
   }
@@ -149,7 +150,8 @@ class UserServiceImplTest {
       assertEquals(userProjects.size(), 2);
       assertTrue(userProjects.contains(ProjectMapper.convertProjectToProjectDto(PROJECT)));
       assertTrue(userProjects.contains(ProjectMapper.convertProjectToProjectDto(PROJECT)));
-      assertThat(output).contains("Found '%s' user projects.".formatted(userProjects.size()));
+      assertThat(output).contains("Found '%s' user projects for user '%s'."
+          .formatted(userProjects.size(), REGULAR_USER.getUsername()));
       REGULAR_USER.getCreatorProjects().clear();
     }
   }
