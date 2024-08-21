@@ -22,7 +22,7 @@ public class UserMapper {
    * @param userRole the role to assign to the user
    * @return the converted User entity
    */
-  public static User convertUserDtoToUser(UserDto userDto, UserRole userRole) {
+  public static User convertUserDtoToUser(final UserDto userDto, final UserRole userRole) {
     return User.builder()
         .username(userDto.username())
         .userPassword(passwordEncoder.encode(userDto.userPassword()))
@@ -36,7 +36,7 @@ public class UserMapper {
    * @param user the User entity to convert
    * @return the converted UserResponseDto
    */
-  public static UserResponseDto convertUserToUserResponseDto(User user) {
+  public static UserResponseDto convertUserToUserResponseDto(final User user) {
     return UserResponseDto.builder()
         .username(user.getUsername())
         .build();

@@ -6,6 +6,7 @@ import com.example.api.dto.ProjectUsersResponseDto;
 import com.example.services.interfaces.ProjectService;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,17 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects")
+@RequiredArgsConstructor
 public class ProjectController {
 
   private final ProjectService projectService;
 
-  public ProjectController(ProjectService projectService) {
-    this.projectService = projectService;
-  }
-
   @PostMapping
   @PreAuthorize("hasRole('CREATOR')")
-  ResponseEntity<ProjectDto> addProject(@Valid @RequestBody ProjectDto projectDto) {
+  ResponseEntity<ProjectDto> addProject(@Valid @RequestBody final ProjectDto projectDto) {
     val createdProject = projectService.saveProject(projectDto);
     return new ResponseEntity<>(createdProject, HttpStatus.CREATED);
   }
@@ -42,7 +40,7 @@ public class ProjectController {
 
   @PutMapping
   @PreAuthorize("hasRole('CREATOR')")
-  ResponseEntity<ProjectUsersResponseDto> updateProjectUsers(@Valid @RequestBody ProjectUsersDto projectUsersDto) {
+  ResponseEntity<ProjectUsersResponseDto> updateProjectUsers(@Valid @RequestBody final ProjectUsersDto projectUsersDto) {
     val resultProjectUsersDto = projectService.addUsersToProject(projectUsersDto);
     return ResponseEntity.ok(resultProjectUsersDto);
   }

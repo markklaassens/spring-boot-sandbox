@@ -3,6 +3,7 @@ package com.example.tools;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import lombok.experimental.UtilityClass;
+import lombok.val;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
@@ -17,10 +18,10 @@ public class PasswordEncoder {
   /**
    * Encodes a userPassword with BCrypt and verifies the result.
    */
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
 
-    String rawPassword = "test123";
-    String encodedPassword = encoder.encode(rawPassword);
+    val rawPassword = "test123";
+    val encodedPassword = encoder.encode(rawPassword);
 
     System.out.println("Raw Password: " + rawPassword);
     System.out.println("Encoded Password: " + encodedPassword);

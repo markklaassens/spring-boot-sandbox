@@ -31,8 +31,7 @@ public class GlobalExceptionHandler {
    * @return a 400 {@link ResponseEntity} with error details
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ErrorDto> handleValidationErrors(
-      MethodArgumentNotValidException exception) {
+  public ResponseEntity<ErrorDto> handleValidationErrors(final MethodArgumentNotValidException exception) {
 
     val messages = exception.getBindingResult().getFieldErrors()
         .stream()
@@ -59,7 +58,7 @@ public class GlobalExceptionHandler {
       NotCreatorOfProjectException.class,
       UsernameAlreadyExistsException.class
   })
-  public ResponseEntity<ErrorDto> handleBadRequest(RuntimeException exception) {
+  public ResponseEntity<ErrorDto> handleBadRequest(final RuntimeException exception) {
     val error = new ErrorDto(exception.getMessage(), HttpStatus.BAD_REQUEST.value());
 
     return ResponseEntity
@@ -79,7 +78,7 @@ public class GlobalExceptionHandler {
       UserNotFoundException.class,
       UserRoleNotFoundException.class
   })
-  public ResponseEntity<ErrorDto> handleNotFound(RuntimeException exception) {
+  public ResponseEntity<ErrorDto> handleNotFound(final RuntimeException exception) {
     val error = new ErrorDto(exception.getMessage(), HttpStatus.NOT_FOUND.value());
 
     return ResponseEntity
@@ -95,7 +94,7 @@ public class GlobalExceptionHandler {
    * @return a ResponseEntity with error details and conflict status
    */
   @ExceptionHandler({DataIntegrityViolationException.class, ObjectOptimisticLockingFailureException.class})
-  public ResponseEntity<ErrorDto> handleTransactionExceptions(Exception exception) {
+  public ResponseEntity<ErrorDto> handleTransactionExceptions(final Exception exception) {
     val error = new ErrorDto(exception.getMessage(), HttpStatus.CONFLICT.value());
 
     return ResponseEntity
@@ -111,7 +110,7 @@ public class GlobalExceptionHandler {
    * @return a ResponseEntity with error details and forbidden status
    */
   @ExceptionHandler(AccessDeniedException.class)
-  public ResponseEntity<ErrorDto> handleAccessDeniedException(AccessDeniedException exception) {
+  public ResponseEntity<ErrorDto> handleAccessDeniedException(final AccessDeniedException exception) {
     val error = new ErrorDto(exception.getMessage(), HttpStatus.FORBIDDEN.value());
 
     return ResponseEntity
@@ -127,7 +126,7 @@ public class GlobalExceptionHandler {
    * @return a ResponseEntity with error details and internal server error status
    */
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<ErrorDto> handleGeneralException(Exception exception) {
+  public ResponseEntity<ErrorDto> handleGeneralException(final Exception exception) {
     val error = new ErrorDto("An unexpected error occurred: " + exception.getMessage(),
         HttpStatus.INTERNAL_SERVER_ERROR.value());
 

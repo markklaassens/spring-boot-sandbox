@@ -2,7 +2,7 @@ package com.example.exceptions;
 
 public class UserNotFoundException extends RuntimeException {
 
-  public UserNotFoundException(String msg) {
+  public UserNotFoundException(final String msg) {
     super(msg);
   }
 }

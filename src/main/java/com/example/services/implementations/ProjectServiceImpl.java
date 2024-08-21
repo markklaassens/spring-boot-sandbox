@@ -23,6 +23,7 @@ import com.example.services.interfaces.UserService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.stereotype.Service;
@@ -30,31 +31,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
 
   private final ProjectRepository projectRepository;
   private final ProjectTypeRepository projectTypeRepository;
   private final UserRepository userRepository;
   private final UserService userService;
-
-  /**
-   * Constructs a ProjectServiceImpl with the given repositories.
-   *
-   * @param projectRepository     the repository for managing projects
-   * @param projectTypeRepository the repository for managing project types
-   * @param userRepository        the repository for managing users
-   * @param userService           the service for retrieving the current user
-   */
-  public ProjectServiceImpl(ProjectRepository projectRepository,
-      ProjectTypeRepository projectTypeRepository,
-      UserRepository userRepository,
-      UserService userService
-  ) {
-    this.projectRepository = projectRepository;
-    this.projectTypeRepository = projectTypeRepository;
-    this.userRepository = userRepository;
-    this.userService = userService;
-  }
 
   @Override
   @Transactional
@@ -88,7 +71,7 @@ public class ProjectServiceImpl implements ProjectService {
 
   @Override
   @Transactional
-  public ProjectUsersResponseDto addUsersToProject(ProjectUsersDto projectUsersDto) {
+  public ProjectUsersResponseDto addUsersToProject(final ProjectUsersDto projectUsersDto) {
     val project = getProject(projectUsersDto.projectName());
     val currentUser = userService.getUser();
     checkIfCurrentUserIsCreatorOfProject(project, currentUser);
@@ -154,7 +137,7 @@ public class ProjectServiceImpl implements ProjectService {
     return optionalProject.get();
   }
 
-  private void checkIfCurrentUserIsCreatorOfProject(Project project, User currentUser) {
+  private void checkIfCurrentUserIsCreatorOfProject(final Project project, final User currentUser) {
     if (!project.getProjectCreator().equals(currentUser)) {
       log.error("User '%s' is not the creator of project '%s'."
           .formatted(currentUser.getUsername(), project.getProjectName()));

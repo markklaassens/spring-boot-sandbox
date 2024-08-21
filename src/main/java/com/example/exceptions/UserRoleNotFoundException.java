@@ -2,7 +2,7 @@ package com.example.exceptions;
 
 public class UserRoleNotFoundException extends RuntimeException {
 
-  public UserRoleNotFoundException(String msg) {
+  public UserRoleNotFoundException(final String msg) {
     super(msg);
   }
 }

@@ -30,11 +30,12 @@ public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column()
-  @EqualsAndHashCode.Include // Include only userId in equals and hashCode
+  @Column
+  @EqualsAndHashCode.Include
   private Integer userId;
 
   @Column(nullable = false, unique = true, length = 50)
+  @EqualsAndHashCode.Include
   private String username;
 
   @Column(nullable = false)

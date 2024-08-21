@@ -2,7 +2,7 @@ package com.example.exceptions;
 
 public class UsernameAlreadyExistsException extends RuntimeException {
 
-  public UsernameAlreadyExistsException(String msg) {
+  public UsernameAlreadyExistsException(final String msg) {
     super(msg);
   }
 }

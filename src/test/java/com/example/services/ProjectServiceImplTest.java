@@ -65,7 +65,7 @@ class ProjectServiceImplTest {
   private ProjectServiceImpl projectService;
 
   @Test
-  void shouldSaveProject(CapturedOutput output) {
+  void shouldSaveProject(final CapturedOutput output) {
     when(projectRepository.findByProjectName(PROJECT_DTO.projectName())).thenReturn(Optional.empty());
     when(projectTypeRepository.findByProjectTypeValue(PROJECT_DTO.projectType()))
         .thenReturn(Optional.of(PROJ_TYPE_COLLABORATIVE));
@@ -82,7 +82,7 @@ class ProjectServiceImplTest {
 
 
   @Test
-  void shouldFindAllProjects(CapturedOutput output) {
+  void shouldFindAllProjects(final CapturedOutput output) {
     when(projectRepository.findAll()).thenReturn(PROJECT_LIST);
 
     val resultList = projectService.findAllProjects();
@@ -93,7 +93,7 @@ class ProjectServiceImplTest {
   }
 
   @Test
-  void shouldReturnEmptyListOnNoProjectsFound(CapturedOutput output) {
+  void shouldReturnEmptyListOnNoProjectsFound(final CapturedOutput output) {
     when(projectRepository.findAll()).thenReturn(Collections.emptyList());
 
     val resultList = projectService.findAllProjects();
@@ -103,7 +103,7 @@ class ProjectServiceImplTest {
   }
 
   @Test
-  void shouldAddUsersToProject(CapturedOutput output) {
+  void shouldAddUsersToProject(final CapturedOutput output) {
     when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
     when(userService.getUser()).thenReturn(CREATOR_USER);
     for (int i = 0; i < PROJECT_USERS_DTO.usernames().size(); i++) {
@@ -129,7 +129,7 @@ class ProjectServiceImplTest {
   }
 
   @Test
-  void shouldNotAddDoubleUsersToProject(CapturedOutput output) {
+  void shouldNotAddDoubleUsersToProject(final CapturedOutput output) {
     when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
     when(userService.getUser()).thenReturn(CREATOR_USER);
     List<String> newUsernames = new ArrayList<>(PROJECT_USERS_DTO.usernames());
@@ -172,7 +172,7 @@ class ProjectServiceImplTest {
   }
 
   @Test
-  void shouldSaveNotFoundUsersWhileAddingUsersToProject(CapturedOutput output) {
+  void shouldSaveNotFoundUsersWhileAddingUsersToProject(final CapturedOutput output) {
     when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
     when(userService.getUser()).thenReturn(CREATOR_USER);
     for (String username : PROJECT_USERS_DTO.usernames()) {
@@ -194,7 +194,7 @@ class ProjectServiceImplTest {
   }
 
   @Test
-  void shouldThrowExceptionWhenProjectAlreadyExists(CapturedOutput output) {
+  void shouldThrowExceptionWhenProjectAlreadyExists(final CapturedOutput output) {
     when(projectRepository.findByProjectName(PROJECT_DTO.projectName()))
         .thenReturn(Optional.of(PROJECT));
 
@@ -211,7 +211,7 @@ class ProjectServiceImplTest {
   }
 
   @Test
-  void shouldThrowExceptionWhenProjectTypeIsNotFound(CapturedOutput output) {
+  void shouldThrowExceptionWhenProjectTypeIsNotFound(final CapturedOutput output) {
     val wrongProjectDto = ProjectDto.builder()
         .projectName("Test")
         .projectDescription("Wrong project DTO.")
@@ -234,7 +234,7 @@ class ProjectServiceImplTest {
   }
 
   @Test
-  void shouldThrowExceptionWhenProjectIsNotFound(CapturedOutput output) {
+  void shouldThrowExceptionWhenProjectIsNotFound(final CapturedOutput output) {
     when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.empty());
 
     val exception = assertThrows(
@@ -248,7 +248,7 @@ class ProjectServiceImplTest {
   }
 
   @Test
-  void shouldThrowExceptionWhenCreatorDoesNotMatchProjectCreator(CapturedOutput output) {
+  void shouldThrowExceptionWhenCreatorDoesNotMatchProjectCreator(final CapturedOutput output) {
     when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
     when(userService.getUser()).thenReturn(REGULAR_USER);
 

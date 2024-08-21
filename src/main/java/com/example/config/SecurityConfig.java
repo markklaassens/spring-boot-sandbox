@@ -1,6 +1,7 @@
 package com.example.config;
 
 import javax.sql.DataSource;
+import lombok.val;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -29,7 +30,7 @@ public class SecurityConfig {
    * @throws Exception if a security configuration error occurs
    */
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
     http
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth -> auth
@@ -55,8 +56,8 @@ public class SecurityConfig {
    * @return the configured {@link UserDetailsService}
    */
   @Bean
-  public UserDetailsService userDetailsService(DataSource dataSource) {
-    JdbcUserDetailsManager manager = new JdbcUserDetailsManager();
+  public UserDetailsService userDetailsService(final DataSource dataSource) {
+    val manager = new JdbcUserDetailsManager();
     manager.setDataSource(dataSource);
 
     manager.setUsersByUsernameQuery(

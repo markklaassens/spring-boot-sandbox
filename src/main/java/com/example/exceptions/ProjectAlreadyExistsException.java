@@ -2,7 +2,7 @@ package com.example.exceptions;
 
 public class ProjectAlreadyExistsException extends RuntimeException {
 
-  public ProjectAlreadyExistsException(String msg) {
+  public ProjectAlreadyExistsException(final String msg) {
     super(msg);
   }
 }

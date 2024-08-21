@@ -55,7 +55,7 @@ class UserServiceImplTest {
 
 
   @Test
-  void shouldSaveUser(CapturedOutput output) {
+  void shouldSaveUser(final CapturedOutput output) {
     when(userRepository.save(any(User.class))).thenReturn(NEW_USER);
     when(userRoleRepository.findByUserRoleValue(ROLE_USER)).thenReturn(Optional.of(USER_ROLE_USER));
 
@@ -66,7 +66,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  void shouldReturnAllUsers(CapturedOutput output) {
+  void shouldReturnAllUsers(final CapturedOutput output) {
     when(userRepository.findAll()).thenReturn(USER_LIST);
     val usernameList = USER_LIST.stream().map(User::getUsername).toList();
 
@@ -80,7 +80,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  void shouldReturnEmptyListWhenNoUsersAreFound(CapturedOutput output) {
+  void shouldReturnEmptyListWhenNoUsersAreFound(final CapturedOutput output) {
     when(userRepository.findAll()).thenReturn(Collections.emptyList());
 
     val userResponseDtoList = userService.findAllUsers();
@@ -90,7 +90,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  void shouldReturnCreatorProjects(CapturedOutput output) {
+  void shouldReturnCreatorProjects(final CapturedOutput output) {
     SecurityContext securityContext = mock(SecurityContext.class);
     Authentication authentication = mock(Authentication.class);
 
@@ -114,7 +114,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  void shouldReturnEmptyListWhenNoCreatorProjectsAreFound(CapturedOutput output) {
+  void shouldReturnEmptyListWhenNoCreatorProjectsAreFound(final CapturedOutput output) {
     SecurityContext securityContext = mock(SecurityContext.class);
     Authentication authentication = mock(Authentication.class);
 
@@ -133,7 +133,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  void shouldReturnUserProjects(CapturedOutput output) {
+  void shouldReturnUserProjects(final CapturedOutput output) {
     SecurityContext securityContext = mock(SecurityContext.class);
     Authentication authentication = mock(Authentication.class);
 
@@ -157,7 +157,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  void shouldReturnEmptyListWhenNoUserProjectsAreFound(CapturedOutput output) {
+  void shouldReturnEmptyListWhenNoUserProjectsAreFound(final CapturedOutput output) {
     SecurityContext securityContext = mock(SecurityContext.class);
     Authentication authentication = mock(Authentication.class);
 
@@ -193,7 +193,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  void shouldThrowExceptionWhenUserNotFound(CapturedOutput output) {
+  void shouldThrowExceptionWhenUserNotFound(final CapturedOutput output) {
     SecurityContext securityContext = mock(SecurityContext.class);
     Authentication authentication = mock(Authentication.class);
 
@@ -211,7 +211,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  void shouldThrowExceptionWhenUsernameAlreadyExists(CapturedOutput output) {
+  void shouldThrowExceptionWhenUsernameAlreadyExists(final CapturedOutput output) {
     when(userRepository.findByUsername(NEW_USER_DTO.username())).thenReturn(Optional.of(NEW_USER));
 
     val exception = assertThrows(UsernameAlreadyExistsException.class, () -> userService.registerUser(NEW_USER_DTO));
@@ -221,7 +221,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  void shouldThrowExceptionWhenUserRoleIsNotFound(CapturedOutput output) {
+  void shouldThrowExceptionWhenUserRoleIsNotFound(final CapturedOutput output) {
     when(userRoleRepository.findByUserRoleValue(ROLE_USER)).thenReturn(Optional.empty());
 
     val exception = assertThrows(UserRoleNotFoundException.class, () -> userService.registerUser(NEW_USER_DTO));

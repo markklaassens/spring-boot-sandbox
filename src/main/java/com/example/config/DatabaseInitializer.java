@@ -4,7 +4,8 @@ import static org.springframework.jdbc.datasource.init.ScriptUtils.executeSqlScr
 
 import java.sql.SQLException;
 import javax.sql.DataSource;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -12,20 +13,14 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 
 @Configuration
 @Profile({"local", "test"})
+@RequiredArgsConstructor
 public class DatabaseInitializer {
 
   private final DataSource dataSource;
   private final Environment environment;
-
-  @Autowired
-  public DatabaseInitializer(DataSource dataSource, Environment environment) {
-    this.dataSource = dataSource;
-    this.environment = environment;
-  }
 
   /**
    * Event listener that loads and executes SQL scripts after the application is ready. The scripts are loaded based on the
@@ -33,7 +28,7 @@ public class DatabaseInitializer {
    */
   @EventListener(ApplicationReadyEvent.class)
   public void loadSqlScripts() throws SQLException {
-    Resource[] scripts = getScriptsForActiveProfile();
+    val scripts = getScriptsForActiveProfile();
 
     for (Resource script : scripts) {
       executeSqlScript(dataSource.getConnection(), script);
@@ -41,7 +36,7 @@ public class DatabaseInitializer {
   }
 
   private Resource[] getScriptsForActiveProfile() {
-    ResourceLoader resourceLoader = new DefaultResourceLoader();
+    val resourceLoader = new DefaultResourceLoader();
     if (environment.matchesProfiles("test")) {
       return new Resource[]{
           resourceLoader.getResource("classpath:/insert_project_types.sql"),

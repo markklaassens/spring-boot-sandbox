@@ -4,7 +4,7 @@ import java.util.List;
 
 public record ErrorDto(List<String> message, Integer statusCode) {
 
-  public ErrorDto(String message, Integer statusCode) {
+  public ErrorDto(final String message, final Integer statusCode) {
     this(List.of(message), statusCode);
   }
 }

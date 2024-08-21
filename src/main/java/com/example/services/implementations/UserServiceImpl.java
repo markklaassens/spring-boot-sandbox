@@ -18,6 +18,7 @@ import com.example.persistence.repositories.UserRoleRepository;
 import com.example.services.interfaces.UserService;
 import java.util.Collections;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,18 +27,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
   private final UserRoleRepository userRoleRepository;
 
-  public UserServiceImpl(UserRepository userRepository, UserRoleRepository userRoleRepository) {
-    this.userRepository = userRepository;
-    this.userRoleRepository = userRoleRepository;
-  }
-
   @Override
-  public UserResponseDto registerUser(UserDto userDto) {
+  public UserResponseDto registerUser(final UserDto userDto) {
     if (userRepository.findByUsername(userDto.username()).isPresent()) {
       log.error("User with username '%s' already exists.".formatted(userDto.username()));
       throw new UsernameAlreadyExistsException("User with username '%s' already exists.".formatted(userDto.username()));
