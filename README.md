@@ -70,6 +70,4 @@ matching the connection restrictions of the LocalRMIServerSocketFactory.
 
 ## Future Improvements
 
-- Enable https
-- Add filestore for storing project images.
-- Add asynchronous database handeling with Reactor
+- Enable HTTPS
