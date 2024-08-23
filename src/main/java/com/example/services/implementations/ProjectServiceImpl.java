@@ -23,6 +23,7 @@ import com.example.services.interfaces.UserService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -78,30 +79,30 @@ public class ProjectServiceImpl implements ProjectService {
 
     val addedUsers = new ArrayList<String>();
     val notAddedUsers = new ArrayList<NotAddedUserDto>();
-    for (String username : projectUsersDto.usernames()) {
-      userRepository.findByUsername(username).ifPresentOrElse(user -> {
-        if (project.getProjectUsers().contains(user)) {
-          notAddedUsers.add(NotAddedUserDto.builder()
-              .username(user.getUsername())
-              .reason("User with username '%s' is already added to project '%s'."
-                  .formatted(user.getUsername(), project.getProjectName()))
-              .build());
-          log.warn("User with username '%s' is already added to project '%s'."
-              .formatted(user.getUsername(), project.getProjectName()));
-        } else {
-          project.getProjectUsers().add(user);
-          addedUsers.add(user.getUsername());
-          log.info("Added user with username '%s' to project '%s'.".formatted(user.getUsername(), project.getProjectName()));
-        }
-      }, () -> {
+    projectUsersDto.usernames().stream().map(username -> userRepository.findByUsername(username).or(() -> {
+      notAddedUsers.add(NotAddedUserDto.builder()
+          .username(username)
+          .reason("Could not find user with username '%s'.".formatted(username))
+          .build());
+      log.warn("Could not find user with username '%s'.".formatted(username));
+      return Optional.empty();
+    })).flatMap(Optional::stream).filter(user -> {
+      if (project.getProjectUsers().contains(user)) {
         notAddedUsers.add(NotAddedUserDto.builder()
-            .username(username)
-            .reason("Could not find user with username '%s'.".formatted(username))
+            .username(user.getUsername())
+            .reason("User with username '%s' is already added to project '%s'."
+                .formatted(user.getUsername(), project.getProjectName()))
             .build());
-        log.warn("Could not find user with username '%s'.".formatted(username));
-      });
-    }
-
+        log.warn("User with username '%s' is already added to project '%s'."
+            .formatted(user.getUsername(), project.getProjectName()));
+        return false;
+      }
+      return true;
+    }).forEach(user -> {
+      project.getProjectUsers().add(user);
+      addedUsers.add(user.getUsername());
+      log.info("Added user with username '%s' to project '%s'.".formatted(user.getUsername(), project.getProjectName()));
+    });
     projectRepository.save(project);
 
     return ProjectUsersResponseDto.builder()
