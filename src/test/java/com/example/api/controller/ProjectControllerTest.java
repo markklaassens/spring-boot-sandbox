@@ -35,14 +35,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = ProjectController.class)
 @ActiveProfiles("test")
+@MockBean(DataSource.class)
 @Import(SecurityConfig.class)
 class ProjectControllerTest {
 
   @Autowired
-  MockMvc mockMvc;
-
-  @MockBean
-  DataSource dataSource; //Mock datasource to initialize SecurityConfig
+  private MockMvc mockMvc;
 
   @MockBean
   private ProjectService projectService;

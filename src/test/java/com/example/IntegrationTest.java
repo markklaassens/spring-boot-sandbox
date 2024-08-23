@@ -11,6 +11,7 @@ import com.example.persistence.repositories.ProjectRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
+import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -64,9 +65,8 @@ import org.springframework.web.context.WebApplicationContext;
 @TestMethodOrder(OrderAnnotation.class)
 class IntegrationTest {
 
-  String projectName = "Ultimate Tic-Tac-Toe";
-  String userToAdd = "user";
-  String newUser = "newuser";
+  private final String projectName = "Ultimate Tic-Tac-Toe";
+  private final String newUser = "newuser";
 
   @BeforeAll
   static void beforeAll(
@@ -101,6 +101,7 @@ class IntegrationTest {
         .body("projectDescription", is("Project for collaborating and developing the game Ultimate Tic-Tac-Toe."))
         .body("projectType", is(COLLABORATIVE));
 
+    val userToAdd = "user";
     given()
         .contentType(ContentType.JSON)
         .body("""

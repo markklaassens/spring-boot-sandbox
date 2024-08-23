@@ -45,13 +45,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 class UserServiceImplTest {
 
   @Mock
-  UserRepository userRepository;
+  private UserRepository userRepository;
 
   @Mock
-  UserRoleRepository userRoleRepository;
+  private UserRoleRepository userRoleRepository;
 
   @InjectMocks
-  UserServiceImpl userService;
+  private UserServiceImpl userService;
 
 
   @Test
@@ -91,8 +91,8 @@ class UserServiceImplTest {
 
   @Test
   void shouldReturnCreatorProjects(final CapturedOutput output) {
-    SecurityContext securityContext = mock(SecurityContext.class);
-    Authentication authentication = mock(Authentication.class);
+    val securityContext = mock(SecurityContext.class);
+    val authentication = mock(Authentication.class);
 
     try (MockedStatic<SecurityContextHolder> mockedSecurityContextHolder = mockStatic(SecurityContextHolder.class)) {
       mockedSecurityContextHolder.when(SecurityContextHolder::getContext).thenReturn(securityContext);
@@ -115,8 +115,8 @@ class UserServiceImplTest {
 
   @Test
   void shouldReturnEmptyListWhenNoCreatorProjectsAreFound(final CapturedOutput output) {
-    SecurityContext securityContext = mock(SecurityContext.class);
-    Authentication authentication = mock(Authentication.class);
+    val securityContext = mock(SecurityContext.class);
+    val authentication = mock(Authentication.class);
 
     try (MockedStatic<SecurityContextHolder> mockedSecurityContextHolder = mockStatic(SecurityContextHolder.class)) {
       mockedSecurityContextHolder.when(SecurityContextHolder::getContext).thenReturn(securityContext);
@@ -134,8 +134,8 @@ class UserServiceImplTest {
 
   @Test
   void shouldReturnUserProjects(final CapturedOutput output) {
-    SecurityContext securityContext = mock(SecurityContext.class);
-    Authentication authentication = mock(Authentication.class);
+    val securityContext = mock(SecurityContext.class);
+    val authentication = mock(Authentication.class);
 
     try (MockedStatic<SecurityContextHolder> mockedSecurityContextHolder = mockStatic(SecurityContextHolder.class)) {
       mockedSecurityContextHolder.when(SecurityContextHolder::getContext).thenReturn(securityContext);
@@ -158,8 +158,8 @@ class UserServiceImplTest {
 
   @Test
   void shouldReturnEmptyListWhenNoUserProjectsAreFound(final CapturedOutput output) {
-    SecurityContext securityContext = mock(SecurityContext.class);
-    Authentication authentication = mock(Authentication.class);
+    val securityContext = mock(SecurityContext.class);
+    val authentication = mock(Authentication.class);
 
     try (MockedStatic<SecurityContextHolder> mockedSecurityContextHolder = mockStatic(SecurityContextHolder.class)) {
       mockedSecurityContextHolder.when(SecurityContextHolder::getContext).thenReturn(securityContext);
@@ -177,8 +177,8 @@ class UserServiceImplTest {
 
   @Test
   void shouldReturnCurrentUser() {
-    SecurityContext securityContext = mock(SecurityContext.class);
-    Authentication authentication = mock(Authentication.class);
+    val securityContext = mock(SecurityContext.class);
+    val authentication = mock(Authentication.class);
 
     try (MockedStatic<SecurityContextHolder> mockedSecurityContextHolder = mockStatic(SecurityContextHolder.class)) {
       mockedSecurityContextHolder.when(SecurityContextHolder::getContext).thenReturn(securityContext);
@@ -194,8 +194,8 @@ class UserServiceImplTest {
 
   @Test
   void shouldThrowExceptionWhenUserNotFound(final CapturedOutput output) {
-    SecurityContext securityContext = mock(SecurityContext.class);
-    Authentication authentication = mock(Authentication.class);
+    val securityContext = mock(SecurityContext.class);
+    val authentication = mock(Authentication.class);
 
     try (MockedStatic<SecurityContextHolder> mockedSecurityContextHolder = mockStatic(SecurityContextHolder.class)) {
       mockedSecurityContextHolder.when(SecurityContextHolder::getContext).thenReturn(securityContext);

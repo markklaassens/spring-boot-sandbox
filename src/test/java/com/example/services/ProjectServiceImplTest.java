@@ -34,7 +34,6 @@ import com.example.services.implementations.ProjectServiceImpl;
 import com.example.services.interfaces.UserService;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import lombok.val;
@@ -108,7 +107,7 @@ class ProjectServiceImplTest {
     when(userService.getUser()).thenReturn(CREATOR_USER);
     for (int i = 0; i < PROJECT_USERS_DTO.usernames().size(); i++) {
       val username = PROJECT_USERS_DTO.usernames().get(i);
-      int id = i + 1;
+      val id = i + 1;
       when(userRepository.findByUsername(username)).thenAnswer(invocation -> Optional.of(User.builder()
           .userId(id) // id doesn't matter since data isn't persisted to database in unittest
           .username(username)
@@ -120,7 +119,7 @@ class ProjectServiceImplTest {
     projectService.addUsersToProject(PROJECT_USERS_DTO);
     val usernameList = PROJECT.getProjectUsers().stream().map(User::getUsername).toList();
 
-    for (String username : PROJECT_USERS_DTO.usernames()) {
+    for (val username : PROJECT_USERS_DTO.usernames()) {
       assertTrue(usernameList.contains(username));
       assertThat(output).contains("Added user with username '%s' to project '%s'."
           .formatted(username, PROJECT_USERS_DTO.projectName()));
@@ -132,12 +131,12 @@ class ProjectServiceImplTest {
   void shouldNotAddDoubleUsersToProject(final CapturedOutput output) {
     when(projectRepository.findByProjectName(PROJECT_USERS_DTO.projectName())).thenReturn(Optional.of(PROJECT));
     when(userService.getUser()).thenReturn(CREATOR_USER);
-    List<String> newUsernames = new ArrayList<>(PROJECT_USERS_DTO.usernames());
+    val newUsernames = new ArrayList<>(PROJECT_USERS_DTO.usernames());
     newUsernames.add("user6");
     newUsernames.add("user6");
     for (int i = 0; i < newUsernames.size(); i++) {
       val username = newUsernames.get(i);
-      int id = i + 1;
+      val id = i + 1;
       when(userRepository.findByUsername(username)).thenAnswer(invocation -> Optional.of(User.builder()
           .userId(id) // id doesn't matter since data isn't persisted to database in unittest
           .username(username)
@@ -155,7 +154,7 @@ class ProjectServiceImplTest {
 
     assertEquals(amountOfUsers + 1, PROJECT.getProjectUsers().size()); // newUsernames has 1 unique added user
     val usernameList = PROJECT.getProjectUsers().stream().map(User::getUsername).toList();
-    for (String username : newUsernames) {
+    for (val username : newUsernames) {
       assertTrue(result.notAddedUsers().contains(NotAddedUserDto.builder()
           .username(username)
           .reason("User with username '%s' is already added to project '%s'."

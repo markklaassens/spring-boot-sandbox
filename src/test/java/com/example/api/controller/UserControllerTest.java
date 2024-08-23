@@ -30,11 +30,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = UserController.class)
+@MockBean(DataSource.class)
 @Import(SecurityConfig.class)
 class UserControllerTest {
-
-  @MockBean
-  DataSource dataSource; //Mock datasource to initialize SecurityConfig
 
   @Autowired
   private MockMvc mockMvc;

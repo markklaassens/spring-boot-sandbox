@@ -48,7 +48,7 @@ public class ProjectServiceImpl implements ProjectService {
     val projectType = getProjectType(projectDto.projectType());
     val projectCreator = userService.getUser();
 
-    Project project = ProjectMapper.convertProjectDtoToProject(projectDto, projectType, projectCreator);
+    val project = ProjectMapper.convertProjectDtoToProject(projectDto, projectType, projectCreator);
     val savedProject = projectRepository.save(project);
 
     log.info("Saved project with id '%s', name '%s' and project creator '%s'"

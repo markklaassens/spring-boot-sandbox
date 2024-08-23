@@ -13,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @UtilityClass
 public class PasswordEncoder {
 
-  public static BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+  public static final BCryptPasswordEncoder ENCODER = new BCryptPasswordEncoder();
 
   /**
    * Encodes a userPassword with BCrypt and verifies the result.
@@ -21,12 +21,12 @@ public class PasswordEncoder {
   public static void main(final String[] args) {
 
     val rawPassword = "test123";
-    val encodedPassword = encoder.encode(rawPassword);
+    val encodedPassword = ENCODER.encode(rawPassword);
 
     System.out.println("Raw Password: " + rawPassword);
     System.out.println("Encoded Password: " + encodedPassword);
 
-    assertTrue(encoder.matches(rawPassword, encodedPassword), "ERROR, "
+    assertTrue(ENCODER.matches(rawPassword, encodedPassword), "ERROR, "
         + "encoded password does not match raw password");
   }
 }
