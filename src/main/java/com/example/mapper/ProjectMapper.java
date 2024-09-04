@@ -5,6 +5,7 @@ import com.example.persistence.entities.Project;
 import com.example.persistence.entities.ProjectType;
 import com.example.persistence.entities.User;
 import java.util.HashSet;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 @SuppressWarnings("java:S1118") // Suppresses Sonar warning which is handled by the @UtilityClass annotation from Lombok
@@ -19,9 +20,9 @@ public class ProjectMapper {
    * @return a {@link Project} entity
    */
   public static Project convertProjectDtoToProject(
-      final ProjectDto projectDto,
-      final ProjectType projectType,
-      final User projectCreator
+      @NonNull final ProjectDto projectDto,
+      @NonNull final ProjectType projectType,
+      @NonNull final User projectCreator
   ) {
     return Project.builder()
         .projectName(projectDto.projectName())
@@ -38,7 +39,7 @@ public class ProjectMapper {
    * @param project the project entity
    * @return a {@link ProjectDto} representation
    */
-  public static ProjectDto convertProjectToProjectDto(final Project project) {
+  public static ProjectDto convertProjectToProjectDto(@NonNull final Project project) {
     return ProjectDto.builder()
         .projectName(project.getProjectName())
         .projectDescription(project.getProjectDescription())

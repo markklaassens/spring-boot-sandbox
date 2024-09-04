@@ -19,4 +19,8 @@ public record ProjectUsersDto(
     List<String> usernames
 ) {
 
+  public ProjectUsersDto {
+    usernames = List.copyOf(usernames);
+  }
+
 }
