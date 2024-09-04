@@ -6,6 +6,7 @@ target/
 ### Repository specific
 .env
 /src/main/resources/insert_users.sql
+/src/main/resources/keystore.p12
 
 ### IntelliJ IDEA ###
 *.idea

@@ -14,6 +14,13 @@ The `DatabaseInitializer` class executes these scripts once the application is r
 By default, the application includes three users: creator, user, and combi. The creator has the CREATOR role, 
 the user has the USER role, and the combi has both roles. These roles determine access to the endpoints defined in the ProjectServiceController.
 
+### Disclaimer
+
+This setup is intended only for local development and testing. The use of HTTP or HTTPS with self-signed 
+certificates, .env files (which are excluded via .gitignore), and the database configuration provided 
+here are not suitable for production environments. Always follow best practices for securing your 
+application, managing secrets, and deploying to production when moving beyond local development.
+
 ## Getting Started
 
 To get started with this repository, follow these steps:
@@ -37,11 +44,11 @@ To get started with this repository, follow these steps:
     - Note: The `PasswordEncoder` utility is in the test directory, so it won’t be included in the compiled application or scanned by Spring Boot.
 - Replace the placeholders `<REPLACE_WITH_ENCODED_CREATOR_PASSWORD>`, `<REPLACE_WITH_ENCODED_USER_PASSWORD>` and `<REPLACE_WITH_ENCODED_ADMIN_PASSWORD>` in your SQL script (`insert_users.sql`) with the encoded values you generated.
 - (Optional) run `mvn versions:display-property-updates` and `mvn versions:display-parent-updates` to check for dependency updates and apply those in `pom.xml`.
+- (Optional) Enable HTTPS: Use a tool like mkcert, keytool, or OpenSSL to create a self-signed certificate. Include the configuration in `application-local.yml`, place the `.p12` file in `src/main/resources`, and ensure it is added to `.gitignore`. Make sure the credentials are kept secure and private by adding them to the `.env` file (which is already included in `.gitignore`).
 - Run the Spring Boot application with the 'local' profile from your IDE.
 - (Alternative) If you don't use IntelliJ IDEA you can run the application with: `mvn spring-boot:run -Dspring-boot.run.profiles=local` from the root directory.
-- Visit the [Swagger UI](http://localhost:8080/spring-boot-sandbox/api/v1/swagger-ui/index.html).
+- Visit the [Swagger UI](http://localhost:8080/spring-boot-sandbox/api/v1/swagger-ui/index.html), or if HTTPS is enabled (and port is set to the standard `8443`), visit https://localhost:8443/spring-boot-sandbox/api/v1/swagger-ui/index.html.
 - Log in with the username and password you set by clicking the white and green Authorize button on the right side of the Swagger UI.
-- By default, the POST endpoint is accessible only to the creator, while the GET endpoint is accessible only to the user. The admin can access both endpoints.
 
 ### Troubleshooting
 
@@ -67,7 +74,3 @@ The RMI service uses the LocalRMIServerSocketFactory to restrict connections to 
 If the JVM does not know which specific interface to bind to, it defaults to 0.0.0.0 (all interfaces), 
 causing this error. By explicitly setting localhost, you ensure the service binds only to the loopback address (127.0.0.1), 
 matching the connection restrictions of the LocalRMIServerSocketFactory.
-
-## Future Improvements
-
-- Enable HTTPS
