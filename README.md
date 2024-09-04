@@ -37,7 +37,7 @@ To get started with this repository, follow these steps:
 
 - Clone the repository to your local machine, preferably using the default develop branch, as it includes the latest approved features.
 - Copy the `template.env` file and rename it to `.env`. Place it in the same directory. Set your local password while leaving the username unchanged.
-- Run `docker compose up -d` to start the database.
+- In  `src/main/resources`, locate `application-localtemplate.txt` copy it and rename it to `application-local.yml`. Place it in the same directory.
 - In `src/main/resources`, locate `insert_userstemplate.txt` copy it and rename it to `insert_users.sql`. Place it in the same directory.
 - Use the `PasswordEncoder` utility located in `src/test/tools/` to generate the encoded passwords:
     - Enter your desired password and run the `PasswordEncoder` utility class manually from your IDE.
@@ -45,6 +45,7 @@ To get started with this repository, follow these steps:
 - Replace the placeholders `<REPLACE_WITH_ENCODED_CREATOR_PASSWORD>`, `<REPLACE_WITH_ENCODED_USER_PASSWORD>` and `<REPLACE_WITH_ENCODED_ADMIN_PASSWORD>` in your SQL script (`insert_users.sql`) with the encoded values you generated.
 - (Optional) run `mvn versions:display-property-updates` and `mvn versions:display-parent-updates` to check for dependency updates and apply those in `pom.xml`.
 - (Optional) Enable HTTPS: Use a tool like mkcert, keytool, or OpenSSL to create a self-signed certificate. Include the configuration in `application-local.yml`, place the `.p12` file in `src/main/resources`, and ensure it is added to `.gitignore`. Make sure the credentials are kept secure and private by adding them to the `.env` file (which is already included in `.gitignore`).
+- Run `docker compose up -d` to start the database.
 - Run the Spring Boot application with the 'local' profile from your IDE.
 - (Alternative) If you don't use IntelliJ IDEA you can run the application with: `mvn spring-boot:run -Dspring-boot.run.profiles=local` from the root directory.
 - Visit the [Swagger UI](http://localhost:8080/spring-boot-sandbox/api/v1/swagger-ui/index.html), or if HTTPS is enabled (and port is set to the standard `8443`), visit https://localhost:8443/spring-boot-sandbox/api/v1/swagger-ui/index.html.
